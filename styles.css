@@ -137,6 +137,9 @@ h1 {
   width: 56px;
   aspect-ratio: 1;
   font-size: 2rem;
+  background: rgba(36, 49, 61, 0.68);
+  box-shadow: 0 8px 18px rgba(36, 49, 61, 0.14);
+  backdrop-filter: blur(4px);
 }
 
 .card-stage {
@@ -154,6 +157,7 @@ h1 {
   min-height: 0;
   width: var(--study-frame-width);
   margin: 0 auto;
+  touch-action: pan-y;
 }
 
 .photo-panel {
@@ -329,6 +333,7 @@ button:disabled {
   min-height: 0;
   width: var(--test-frame-width);
   margin: 0 auto;
+  touch-action: pan-y;
 }
 
 .test-photo {
@@ -395,11 +400,12 @@ button:disabled {
   width: 64px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--ink);
+  background: rgba(36, 49, 61, 0.68);
   color: #fff;
   font-size: 2rem;
   font-weight: 800;
-  box-shadow: 0 10px 22px rgba(36, 49, 61, 0.18);
+  box-shadow: 0 8px 18px rgba(36, 49, 61, 0.14);
+  backdrop-filter: blur(4px);
 }
 
 .test-footer {
@@ -886,8 +892,9 @@ button:disabled {
   .card-stage .nav-button {
     position: absolute;
     z-index: 2;
-    top: 50%;
+    top: 62%;
     transform: translateY(-50%);
+    background: rgba(36, 49, 61, 0.5);
   }
 
   .card-stage .nav-button.previous {
@@ -932,8 +939,11 @@ button:disabled {
   .test-nav {
     position: absolute;
     z-index: 2;
+    top: 62%;
     width: 46px;
     font-size: 1.55rem;
+    transform: translateY(-50%);
+    background: rgba(36, 49, 61, 0.5);
   }
 
   .test-nav.previous {

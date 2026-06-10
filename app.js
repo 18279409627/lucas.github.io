@@ -194,6 +194,7 @@ function getLocalCards() {
 }
 
 const elements = {
+  studyCard: document.getElementById("studyCard"),
   cardImage: document.getElementById("cardImage"),
   emptyIllustration: document.getElementById("emptyIllustration"),
   englishWord: document.getElementById("englishWord"),
@@ -216,6 +217,7 @@ const elements = {
   testNextButton: document.getElementById("testNextButton"),
   testSpeakEnglishButton: document.getElementById("testSpeakEnglishButton"),
   testSpeakChineseButton: document.getElementById("testSpeakChineseButton"),
+  testCard: document.querySelector(".test-card"),
   testCardImage: document.getElementById("testCardImage"),
   testEmptyIllustration: document.getElementById("testEmptyIllustration"),
   testCardCount: document.getElementById("testCardCount"),
@@ -1030,9 +1032,54 @@ function closeSettings() {
   elements.settingsPanel.setAttribute("aria-hidden", "true");
 }
 
+function bindSwipe(element, onSwipeLeft, onSwipeRight) {
+  if (!element) {
+    return;
+  }
+
+  let startX = 0;
+  let startY = 0;
+  let trackingPointerId = null;
+
+  element.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    startX = event.clientX;
+    startY = event.clientY;
+    trackingPointerId = event.pointerId;
+  });
+
+  element.addEventListener("pointerup", (event) => {
+    if (trackingPointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - startX;
+    const deltaY = event.clientY - startY;
+    const isHorizontalSwipe = Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4;
+
+    if (isHorizontalSwipe) {
+      if (deltaX < 0) {
+        onSwipeLeft();
+      } else {
+        onSwipeRight();
+      }
+    }
+
+    trackingPointerId = null;
+  });
+
+  element.addEventListener("pointercancel", () => {
+    trackingPointerId = null;
+  });
+}
+
 function bindEvents() {
   elements.previousButton.addEventListener("click", () => moveCard(-1));
   elements.nextButton.addEventListener("click", () => moveCard(1));
+  bindSwipe(elements.studyCard, () => moveCard(1), () => moveCard(-1));
   elements.speakEnglishButton.addEventListener("click", () => speak(getCurrentCard()?.english, getEnglishAccent()));
   elements.speakChineseButton.addEventListener("click", () => speak(getCurrentCard()?.chinese, "zh-CN"));
   elements.englishAccentSelect.addEventListener("change", () => {
@@ -1046,6 +1093,7 @@ function bindEvents() {
   elements.closeTestButton.addEventListener("click", closeTest);
   elements.testPreviousButton.addEventListener("click", () => moveTestCard(-1));
   elements.testNextButton.addEventListener("click", () => moveTestCard(1));
+  bindSwipe(elements.testCard, () => moveTestCard(1), () => moveTestCard(-1));
   elements.testSpeakEnglishButton.addEventListener("click", () => speak(getCurrentTestCard()?.english, getEnglishAccent()));
   elements.testSpeakChineseButton.addEventListener("click", () => speak(getCurrentTestCard()?.chinese, "zh-CN"));
   elements.settingsButton.addEventListener("click", openSettings);
