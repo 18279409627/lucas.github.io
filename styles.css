@@ -1079,7 +1079,11 @@ button:disabled {
   }
 
   .study-card {
-    width: min(100%, 52svh);
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 18vw);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 8px;
+    width: min(100%, calc(62svh + 158px));
     min-height: 0;
   }
 
@@ -1090,7 +1094,9 @@ button:disabled {
   .word-panel {
     grid-template-columns: 38px minmax(0, 1fr) 38px;
     gap: 7px;
-    margin-top: 5px;
+    align-self: stretch;
+    align-content: center;
+    margin-top: 0;
     padding: 5px 8px;
   }
 
@@ -1166,7 +1172,11 @@ button:disabled {
   }
 
   .test-card {
-    width: min(100%, 54svh);
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 18vw);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 8px;
+    width: min(100%, calc(64svh + 158px));
   }
 
   .test-photo {
@@ -1176,7 +1186,9 @@ button:disabled {
   .test-words {
     grid-template-columns: 38px minmax(0, 1fr) 38px;
     gap: 7px;
-    margin-top: 5px;
+    align-self: stretch;
+    align-content: center;
+    margin-top: 0;
     padding: 5px 8px;
   }
 
