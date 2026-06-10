@@ -137,8 +137,8 @@ h1 {
   width: 56px;
   aspect-ratio: 1;
   font-size: 2rem;
-  align-self: end;
-  margin-bottom: 18px;
+  align-self: center;
+  margin-bottom: 0;
   background: rgba(36, 49, 61, 0.42);
   border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: 0 8px 18px rgba(36, 49, 61, 0.1);
@@ -147,8 +147,8 @@ h1 {
 
 .card-stage {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) 56px;
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
   align-items: center;
   min-height: 0;
   padding: 8px 20px 14px;
@@ -189,12 +189,20 @@ h1 {
 }
 
 .word-panel {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 56px;
+  gap: 10px;
+  align-items: center;
   margin-top: 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px 14px;
   background: rgba(255, 254, 250, 0.96);
   text-align: center;
+}
+
+.word-content {
+  min-width: 0;
 }
 
 .card-count {
@@ -324,9 +332,9 @@ button:disabled {
 
 .test-main {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) 64px;
-  gap: 14px;
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  align-items: center;
   min-height: 0;
 }
 
@@ -363,6 +371,10 @@ button:disabled {
 }
 
 .test-words {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 64px;
+  gap: 10px;
+  align-items: center;
   margin-top: 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -402,8 +414,8 @@ button:disabled {
   place-items: center;
   width: 64px;
   aspect-ratio: 1;
-  align-self: end;
-  margin-bottom: 18px;
+  align-self: center;
+  margin-bottom: 0;
   border-radius: 50%;
   background: rgba(36, 49, 61, 0.42);
   border: 1px solid rgba(255, 255, 255, 0.6);
@@ -848,9 +860,9 @@ button:disabled {
 
   .card-stage {
     position: relative;
-    grid-template-columns: 46px minmax(0, 1fr) 46px;
-    align-items: end;
-    gap: 7px;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0;
     min-height: 0;
     padding-top: 6px;
     padding-bottom: 8px;
@@ -862,6 +874,8 @@ button:disabled {
   }
 
   .word-panel {
+    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    gap: 8px;
     margin-top: 6px;
     padding: 7px 10px 8px;
   }
@@ -899,18 +913,19 @@ button:disabled {
   .card-stage .nav-button {
     position: static;
     z-index: auto;
+    bottom: auto;
     transform: none;
     width: 42px;
-    margin-bottom: 12px;
+    margin-bottom: 0;
     background: rgba(36, 49, 61, 0.28);
   }
 
   .card-stage .nav-button.previous {
-    left: auto;
+    left: 32px;
   }
 
   .card-stage .nav-button.next {
-    right: auto;
+    right: 32px;
   }
 
   .test-overlay {
@@ -936,9 +951,9 @@ button:disabled {
 
   .test-main {
     position: relative;
-    grid-template-columns: 46px minmax(0, 1fr) 46px;
-    gap: 7px;
-    align-items: end;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    align-items: stretch;
   }
 
   .test-card {
@@ -953,6 +968,12 @@ button:disabled {
     margin-bottom: 12px;
     transform: none;
     background: rgba(36, 49, 61, 0.28);
+  }
+
+  .test-words {
+    grid-template-columns: 46px minmax(0, 1fr) 46px;
+    gap: 8px;
+    padding: 7px 10px 8px;
   }
 
   .test-nav.previous {

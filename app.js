@@ -1036,6 +1036,38 @@ function closeSettings() {
   elements.settingsPanel.setAttribute("aria-hidden", "true");
 }
 
+function arrangeStudyWordPanel() {
+  const wordPanel = elements.cardCount?.closest(".word-panel");
+  if (!wordPanel || wordPanel.querySelector(".word-content")) {
+    return;
+  }
+
+  const wordContent = document.createElement("div");
+  wordContent.className = "word-content";
+  wordContent.append(elements.cardCount, elements.englishWord, elements.chineseWord);
+  elements.previousButton.setAttribute("aria-label", "Previous card");
+  elements.previousButton.title = "Previous card";
+  elements.nextButton.setAttribute("aria-label", "Next card");
+  elements.nextButton.title = "Next card";
+  wordPanel.append(elements.previousButton, wordContent, elements.nextButton);
+}
+
+function arrangeTestWordPanel() {
+  const wordPanel = elements.testCardCount?.closest(".test-words");
+  if (!wordPanel || wordPanel.querySelector(".word-content")) {
+    return;
+  }
+
+  const wordContent = document.createElement("div");
+  wordContent.className = "word-content";
+  wordContent.append(elements.testCardCount, elements.testEnglishWord, elements.testChineseWord);
+  elements.testPreviousButton.setAttribute("aria-label", "Previous test card");
+  elements.testPreviousButton.title = "Previous test card";
+  elements.testNextButton.setAttribute("aria-label", "Next test card");
+  elements.testNextButton.title = "Next test card";
+  wordPanel.append(elements.testPreviousButton, wordContent, elements.testNextButton);
+}
+
 function bindSwipe(element, onSwipeLeft, onSwipeRight) {
   if (!element) {
     return;
@@ -1081,6 +1113,8 @@ function bindSwipe(element, onSwipeLeft, onSwipeRight) {
 }
 
 function bindEvents() {
+  arrangeStudyWordPanel();
+  arrangeTestWordPanel();
   elements.previousButton.addEventListener("click", () => moveCard(-1));
   elements.nextButton.addEventListener("click", () => moveCard(1));
   bindSwipe(elements.studyCard, () => moveCard(1), () => moveCard(-1));
