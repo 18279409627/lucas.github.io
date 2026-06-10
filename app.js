@@ -380,6 +380,10 @@ function renderGroupControls() {
     elements.groupFilter.append(option);
   });
 
+  Array.from(elements.groupFilter.options).forEach((option) => {
+    option.textContent = option.textContent.replace(/\s*[（(]\d+[）)]$/, "");
+  });
+
   elements.groupFilter.value = state.currentGroup;
   elements.groupOptions.replaceChildren(
     ...groups.map((group) => {
