@@ -137,8 +137,9 @@ h1 {
   width: 56px;
   aspect-ratio: 1;
   font-size: 2rem;
-  background: rgba(36, 49, 61, 0.68);
-  box-shadow: 0 8px 18px rgba(36, 49, 61, 0.14);
+  background: rgba(36, 49, 61, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 18px rgba(36, 49, 61, 0.1);
   backdrop-filter: blur(4px);
 }
 
@@ -400,11 +401,12 @@ button:disabled {
   width: 64px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: rgba(36, 49, 61, 0.68);
+  background: rgba(36, 49, 61, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   color: #fff;
   font-size: 2rem;
   font-weight: 800;
-  box-shadow: 0 8px 18px rgba(36, 49, 61, 0.14);
+  box-shadow: 0 8px 18px rgba(36, 49, 61, 0.1);
   backdrop-filter: blur(4px);
 }
 
@@ -894,7 +896,7 @@ button:disabled {
     z-index: 2;
     top: 62%;
     transform: translateY(-50%);
-    background: rgba(36, 49, 61, 0.5);
+    background: rgba(36, 49, 61, 0.28);
   }
 
   .card-stage .nav-button.previous {
@@ -943,7 +945,7 @@ button:disabled {
     width: 46px;
     font-size: 1.55rem;
     transform: translateY(-50%);
-    background: rgba(36, 49, 61, 0.5);
+    background: rgba(36, 49, 61, 0.28);
   }
 
   .test-nav.previous {
