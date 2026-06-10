@@ -22,8 +22,8 @@
               <option value="all">全部</option>
             </select>
           </label>
-          <button class="icon-button" id="openEditorButton" type="button" aria-label="添加卡片" title="添加卡片">
-            <span aria-hidden="true">+</span>
+          <button class="settings-button" id="settingsButton" type="button" aria-label="打开设置">
+            设置
           </button>
         </header>
 
@@ -54,17 +54,10 @@
           <button class="nav-button" id="previousButton" type="button" aria-label="上一张" title="上一张">
             <span aria-hidden="true">&#8592;</span>
           </button>
-          <div class="english-speech-control">
-            <label for="englishAccentSelect">英文发音</label>
-            <select id="englishAccentSelect">
-              <option value="en-US">美式</option>
-              <option value="en-GB">英式</option>
-            </select>
-            <button class="speak-button english" id="speakEnglishButton" type="button">
-              <span class="button-main">English</span>
-              <span class="button-sub">读英文</span>
-            </button>
-          </div>
+          <button class="speak-button english" id="speakEnglishButton" type="button">
+            <span class="button-main">English</span>
+            <span class="button-sub">读英文</span>
+          </button>
           <button class="speak-button chinese" id="speakChineseButton" type="button">
             <span class="button-main">中文</span>
             <span class="button-sub">读中文</span>
@@ -75,45 +68,73 @@
         </section>
       </section>
 
-      <aside class="side-panel" aria-label="卡片管理">
+      <aside class="side-panel" id="settingsPanel" aria-label="设置" aria-hidden="true">
         <div class="panel-header">
-          <h2>卡片管理</h2>
-          <button class="text-button" id="clearButton" type="button">清空</button>
+          <h2>设置</h2>
+          <button class="text-button" id="closeSettingsButton" type="button">关闭</button>
         </div>
 
-        <form class="card-form" id="cardForm">
-          <label class="upload-box" for="photoInput">
-            <input id="photoInput" type="file" accept="image/*" capture="environment" />
-            <span class="upload-title">拍照或上传图片</span>
-            <span class="upload-hint" id="uploadHint">选择一张卡片照片，会自动识别英文</span>
+        <section class="settings-panel" aria-label="设置">
+          <h3>发音</h3>
+          <label class="settings-field" for="englishAccentSelect">
+            英文发音
+            <select id="englishAccentSelect">
+              <option value="en-US" selected>美式</option>
+              <option value="en-GB">英式</option>
+            </select>
           </label>
-
-          <label>
-            分组
-            <input id="groupInput" type="text" list="groupOptions" autocomplete="off" placeholder="动物" />
-            <datalist id="groupOptions"></datalist>
+          <label class="settings-field" for="englishVoiceSelect">
+            英文语音
+            <select id="englishVoiceSelect">
+              <option value="auto">自动优选</option>
+            </select>
           </label>
-
-          <label>
-            英文
-            <input id="englishInput" type="text" autocomplete="off" placeholder="apple" required />
+          <label class="settings-field" for="speechRateInput">
+            语速 <span id="speechRateValue">0.90</span>
+            <input id="speechRateInput" type="range" min="0.75" max="1.05" step="0.01" value="0.90" />
           </label>
+        </section>
 
-          <label>
-            中文
-            <input id="chineseInput" type="text" autocomplete="off" placeholder="苹果" required />
-          </label>
+        <section class="management-panel" aria-label="卡片管理">
+          <div class="management-header">
+            <h3>卡片管理</h3>
+            <button class="text-button" id="clearButton" type="button">清空</button>
+          </div>
 
-          <p class="recognition-status" id="recognitionStatus">上传后会自动填写英文和中文，可手动修改。OCR 和在线翻译需要联网。</p>
+          <form class="card-form" id="cardForm">
+            <label class="upload-box" for="photoInput">
+              <input id="photoInput" type="file" accept="image/*" capture="environment" />
+              <span class="upload-title">拍照或上传图片</span>
+              <span class="upload-hint" id="uploadHint">选择一张卡片照片，会自动识别英文</span>
+            </label>
 
-          <button class="primary-button" type="submit">保存卡片</button>
-        </form>
+            <label>
+              分组
+              <input id="groupInput" type="text" list="groupOptions" autocomplete="off" placeholder="动物" />
+              <datalist id="groupOptions"></datalist>
+            </label>
 
-        <div class="list-header">
-          <h3>已添加</h3>
-          <span id="listTotal">0 张</span>
-        </div>
-        <div class="card-list" id="cardList"></div>
+            <label>
+              英文
+              <input id="englishInput" type="text" autocomplete="off" placeholder="apple" required />
+            </label>
+
+            <label>
+              中文
+              <input id="chineseInput" type="text" autocomplete="off" placeholder="苹果" required />
+            </label>
+
+            <p class="recognition-status" id="recognitionStatus">上传后会自动填写英文和中文，可手动修改。OCR 和在线翻译需要联网。</p>
+
+            <button class="primary-button" type="submit">保存卡片</button>
+          </form>
+
+          <div class="list-header">
+            <h3>已添加</h3>
+            <span id="listTotal">0 张</span>
+          </div>
+          <div class="card-list" id="cardList"></div>
+        </section>
       </aside>
     </main>
 

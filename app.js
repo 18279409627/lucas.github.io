@@ -2,7 +2,9 @@ const DB_NAME = "kindergarten-english-cards";
 const DB_VERSION = 1;
 const STORE_NAME = "cards";
 const DEFAULT_GROUP = "默认";
-const ACCENT_STORAGE_KEY = "kindergarten-english-accent";
+const ACCENT_STORAGE_KEY = "kindergarten-english-accent-v2";
+const VOICE_STORAGE_KEY = "kindergarten-english-voice-v2";
+const RATE_STORAGE_KEY = "kindergarten-speech-rate-v2";
 
 const WORD_DICTIONARY = {
   apple: "苹果",
@@ -197,7 +199,12 @@ const elements = {
   speakEnglishButton: document.getElementById("speakEnglishButton"),
   speakChineseButton: document.getElementById("speakChineseButton"),
   englishAccentSelect: document.getElementById("englishAccentSelect"),
-  openEditorButton: document.getElementById("openEditorButton"),
+  englishVoiceSelect: document.getElementById("englishVoiceSelect"),
+  speechRateInput: document.getElementById("speechRateInput"),
+  speechRateValue: document.getElementById("speechRateValue"),
+  settingsButton: document.getElementById("settingsButton"),
+  closeSettingsButton: document.getElementById("closeSettingsButton"),
+  settingsPanel: document.getElementById("settingsPanel"),
   clearButton: document.getElementById("clearButton"),
   cardForm: document.getElementById("cardForm"),
   photoInput: document.getElementById("photoInput"),
@@ -384,6 +391,9 @@ function render() {
   elements.groupInput.disabled = !state.storageReady;
   elements.englishInput.disabled = !state.storageReady;
   elements.chineseInput.disabled = !state.storageReady;
+  elements.englishAccentSelect.disabled = false;
+  elements.englishVoiceSelect.disabled = false;
+  elements.speechRateInput.disabled = false;
   elements.groupFilter.disabled = state.cards.length === 0;
   elements.cardForm.querySelector("button[type='submit']").disabled = !state.storageReady || state.isRecognizing;
   elements.listTotal.textContent =
@@ -458,18 +468,70 @@ function moveCard(direction) {
   render();
 }
 
-function pickVoice(lang) {
-  const voices = window.speechSynthesis?.getVoices?.() ?? [];
-  const exact = voices.find((voice) => voice.lang.toLowerCase() === lang.toLowerCase());
-  if (exact) {
-    return exact;
+function getVoices() {
+  return window.speechSynthesis?.getVoices?.() ?? [];
+}
+
+function scoreVoice(voice, lang) {
+  const name = voice.name.toLowerCase();
+  let score = 0;
+
+  if (voice.lang.toLowerCase() === lang.toLowerCase()) {
+    score += 80;
+  } else if (voice.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase())) {
+    score += 30;
+  } else {
+    return -1;
   }
 
-  return voices.find((voice) => voice.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
+  if (/natural|premium|enhanced|online/.test(name)) score += 24;
+  if (/google|microsoft|apple/.test(name)) score += 18;
+  if (/aria|jenny|guy|samantha|daniel|serena|libby|susan|karen/.test(name)) score += 14;
+  if (/zira|david/.test(name)) score += 6;
+  if (voice.localService) score += 4;
+
+  return score;
+}
+
+function pickVoice(lang, preferredVoiceURI = "auto") {
+  const voices = window.speechSynthesis?.getVoices?.() ?? [];
+  if (preferredVoiceURI !== "auto") {
+    const preferred = voices.find((voice) => voice.voiceURI === preferredVoiceURI);
+    if (preferred) {
+      return preferred;
+    }
+  }
+
+  const exact = voices.find((voice) => voice.lang.toLowerCase() === lang.toLowerCase());
+  const candidates = voices
+    .filter((voice) => scoreVoice(voice, lang) >= 0)
+    .sort((a, b) => scoreVoice(b, lang) - scoreVoice(a, lang));
+
+  if (candidates.length > 0) {
+    return candidates[0];
+  }
+
+  return exact || voices.find((voice) => voice.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
 }
 
 function getEnglishAccent() {
   return elements.englishAccentSelect.value || "en-US";
+}
+
+function getSpeechRate() {
+  const rate = Number.parseFloat(elements.speechRateInput.value);
+  return Number.isFinite(rate) ? rate : 0.9;
+}
+
+function updateSpeechRateLabel() {
+  elements.speechRateValue.textContent = getSpeechRate().toFixed(2);
+}
+
+function saveSpeechSettings() {
+  localStorage.setItem(ACCENT_STORAGE_KEY, getEnglishAccent());
+  localStorage.setItem(VOICE_STORAGE_KEY, elements.englishVoiceSelect.value || "auto");
+  localStorage.setItem(RATE_STORAGE_KEY, String(getSpeechRate()));
+  updateSpeechRateLabel();
 }
 
 function loadEnglishAccent() {
@@ -477,10 +539,38 @@ function loadEnglishAccent() {
   if (savedAccent === "en-US" || savedAccent === "en-GB") {
     elements.englishAccentSelect.value = savedAccent;
   }
+
+  const savedRate = Number.parseFloat(localStorage.getItem(RATE_STORAGE_KEY));
+  if (Number.isFinite(savedRate)) {
+    elements.speechRateInput.value = String(Math.min(Math.max(savedRate, 0.75), 1.05));
+  }
+
+  updateSpeechRateLabel();
+  populateEnglishVoiceSelect();
 }
 
-function saveEnglishAccent() {
-  localStorage.setItem(ACCENT_STORAGE_KEY, getEnglishAccent());
+function populateEnglishVoiceSelect() {
+  const currentValue = localStorage.getItem(VOICE_STORAGE_KEY) || elements.englishVoiceSelect.value || "auto";
+  const lang = getEnglishAccent();
+  const voices = getVoices()
+    .filter((voice) => scoreVoice(voice, lang) >= 0)
+    .sort((a, b) => scoreVoice(b, lang) - scoreVoice(a, lang));
+
+  elements.englishVoiceSelect.replaceChildren();
+
+  const autoOption = document.createElement("option");
+  autoOption.value = "auto";
+  autoOption.textContent = "自动优选";
+  elements.englishVoiceSelect.append(autoOption);
+
+  voices.forEach((voice) => {
+    const option = document.createElement("option");
+    option.value = voice.voiceURI;
+    option.textContent = `${voice.name} (${voice.lang})`;
+    elements.englishVoiceSelect.append(option);
+  });
+
+  elements.englishVoiceSelect.value = voices.some((voice) => voice.voiceURI === currentValue) ? currentValue : "auto";
 }
 
 function speak(text, lang) {
@@ -491,10 +581,12 @@ function speak(text, lang) {
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
-  utterance.rate = lang.startsWith("en") ? 0.82 : 0.9;
-  utterance.pitch = 1.08;
+  utterance.rate = lang.startsWith("en") ? getSpeechRate() : 0.9;
+  utterance.pitch = 1;
+  utterance.volume = 1;
 
-  const voice = pickVoice(lang);
+  const preferredVoiceURI = lang.startsWith("en") ? elements.englishVoiceSelect.value : "auto";
+  const voice = pickVoice(lang, preferredVoiceURI);
   if (voice) {
     utterance.voice = voice;
   }
@@ -761,13 +853,29 @@ async function clearCards() {
   render();
 }
 
+function openSettings() {
+  elements.settingsPanel.classList.add("open");
+  elements.settingsPanel.setAttribute("aria-hidden", "false");
+}
+
+function closeSettings() {
+  elements.settingsPanel.classList.remove("open");
+  elements.settingsPanel.setAttribute("aria-hidden", "true");
+}
+
 function bindEvents() {
   elements.previousButton.addEventListener("click", () => moveCard(-1));
   elements.nextButton.addEventListener("click", () => moveCard(1));
   elements.speakEnglishButton.addEventListener("click", () => speak(getCurrentCard()?.english, getEnglishAccent()));
   elements.speakChineseButton.addEventListener("click", () => speak(getCurrentCard()?.chinese, "zh-CN"));
-  elements.englishAccentSelect.addEventListener("change", saveEnglishAccent);
-  elements.openEditorButton.addEventListener("click", () => elements.photoInput.click());
+  elements.englishAccentSelect.addEventListener("change", () => {
+    populateEnglishVoiceSelect();
+    saveSpeechSettings();
+  });
+  elements.englishVoiceSelect.addEventListener("change", saveSpeechSettings);
+  elements.speechRateInput.addEventListener("input", saveSpeechSettings);
+  elements.settingsButton.addEventListener("click", openSettings);
+  elements.closeSettingsButton.addEventListener("click", closeSettings);
   elements.clearButton.addEventListener("click", clearCards);
   elements.photoInput.addEventListener("change", handlePhotoChange);
   elements.cardForm.addEventListener("submit", handleSubmit);
@@ -777,11 +885,14 @@ function bindEvents() {
     resetForm();
     render();
   });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeSettings();
+    }
+  });
 
   window.speechSynthesis?.addEventListener?.("voiceschanged", () => {
-    pickVoice("en-US");
-    pickVoice("en-GB");
-    pickVoice("zh-CN");
+    populateEnglishVoiceSelect();
   });
 }
 

@@ -44,8 +44,7 @@ button {
 
 .app-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
   min-height: 100vh;
   padding: 24px;
 }
@@ -115,18 +114,28 @@ h1 {
   line-height: 1;
 }
 
-.icon-button,
+.settings-button,
 .nav-button {
   display: inline-grid;
   place-items: center;
-  width: 58px;
-  aspect-ratio: 1;
   border-radius: 50%;
   background: var(--ink);
   color: #fff;
-  font-size: 2rem;
   font-weight: 800;
   box-shadow: 0 10px 22px rgba(36, 49, 61, 0.18);
+}
+
+.settings-button {
+  width: 70px;
+  min-height: 46px;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.nav-button {
+  width: 58px;
+  aspect-ratio: 1;
+  font-size: 2rem;
 }
 
 .card-stage {
@@ -199,40 +208,9 @@ h1 {
 
 .controls {
   display: grid;
-  grid-template-columns: 64px minmax(150px, 1fr) minmax(120px, 1fr) 64px;
+  grid-template-columns: 64px minmax(120px, 1fr) minmax(120px, 1fr) 64px;
   gap: 14px;
   padding: 0 28px 28px;
-}
-
-.english-speech-control {
-  display: grid;
-  grid-template-columns: minmax(74px, 0.45fr) minmax(84px, 0.55fr);
-  grid-template-rows: 22px 1fr;
-  gap: 4px 8px;
-  min-width: 0;
-}
-
-.english-speech-control label {
-  align-self: end;
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-.english-speech-control select {
-  min-width: 0;
-  min-height: 30px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0 8px;
-  background: #fff;
-  color: var(--ink);
-  font-weight: 800;
-  outline: none;
-}
-
-.english-speech-control .speak-button {
-  grid-column: 1 / -1;
 }
 
 .speak-button,
@@ -277,14 +255,27 @@ button:disabled {
 }
 
 .side-panel {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 20;
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 48px);
+  width: min(390px, calc(100vw - 36px));
+  max-height: calc(100vh - 36px);
+  overflow: auto;
   border-radius: 8px;
   padding: 22px;
+  transform: translateX(calc(100% + 32px));
+  transition: transform 180ms ease;
+}
+
+.side-panel.open {
+  transform: translateX(0);
 }
 
 .panel-header,
+.management-header,
 .list-header {
   display: flex;
   align-items: center;
@@ -293,6 +284,7 @@ button:disabled {
 }
 
 .panel-header h2,
+.management-header h3,
 .list-header h3 {
   margin-bottom: 0;
 }
@@ -302,6 +294,49 @@ button:disabled {
   padding: 0 16px;
   background: #f1e8da;
   color: var(--ink);
+}
+
+.settings-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #fff;
+}
+
+.management-panel {
+  margin-top: 18px;
+}
+
+.settings-panel h3 {
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.settings-field {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.settings-field select,
+.settings-field input[type="range"] {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+}
+
+.settings-field input[type="range"] {
+  padding: 0;
+  accent-color: var(--blue);
 }
 
 .card-form {
@@ -331,7 +366,8 @@ button:disabled {
 
 .card-form input[type="text"]:focus,
 .group-filter select:focus,
-.english-speech-control select:focus,
+.settings-field select:focus,
+.settings-field input[type="range"]:focus,
 .upload-box:focus-within {
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(51, 120, 212, 0.16);
@@ -540,8 +576,7 @@ button:disabled {
     padding: 14px;
   }
 
-  .workspace,
-  .side-panel {
+  .workspace {
     min-height: auto;
   }
 
@@ -600,30 +635,20 @@ button:disabled {
     gap: 8px;
   }
 
-  .icon-button,
+  .settings-button,
   .nav-button {
     width: 50px;
     font-size: 1.7rem;
   }
 
+  .settings-button {
+    width: 64px;
+    min-height: 42px;
+    font-size: 0.9rem;
+  }
+
   .speak-button {
     min-height: 58px;
-  }
-
-  .english-speech-control {
-    grid-template-columns: minmax(58px, 0.45fr) minmax(58px, 0.55fr);
-    grid-template-rows: 18px 1fr;
-    gap: 3px 5px;
-  }
-
-  .english-speech-control label {
-    font-size: 0.72rem;
-  }
-
-  .english-speech-control select {
-    min-height: 26px;
-    padding: 0 4px;
-    font-size: 0.78rem;
   }
 
   .button-main {
@@ -635,6 +660,10 @@ button:disabled {
   }
 
   .side-panel {
+    top: 10px;
+    right: 10px;
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
     padding: 16px;
   }
 
@@ -645,24 +674,39 @@ button:disabled {
 
   .study-card {
     width: 100%;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .word-panel {
-    min-height: 138px;
-    padding: 16px 14px 18px;
+    min-height: 0;
+    margin-top: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 12px 11px;
+    background: rgba(255, 254, 250, 0.96);
   }
 
   .card-count {
-    margin-bottom: 8px;
-    font-size: 0.82rem;
+    margin-bottom: 4px;
+    font-size: 0.72rem;
   }
 
   #englishWord {
-    margin-bottom: 8px;
-    font-size: clamp(2rem, 12vw, 3.2rem);
+    margin-bottom: 3px;
+    font-size: clamp(1.25rem, 7vw, 1.85rem);
+    line-height: 1.05;
   }
 
   #chineseWord {
-    font-size: clamp(1.35rem, 7.5vw, 2.1rem);
+    font-size: clamp(1rem, 5.6vw, 1.45rem);
+    line-height: 1.08;
+  }
+
+  .photo-panel {
+    border: 1px solid var(--line);
+    border-radius: 8px;
   }
 }
