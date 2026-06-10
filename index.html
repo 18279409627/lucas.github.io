@@ -12,10 +12,7 @@
     <main class="app-shell">
       <section class="workspace" aria-label="英语学习卡片">
         <header class="topbar">
-          <div>
-            <p class="eyebrow">Kindergarten English Cards</p>
-            <h1>英语卡片</h1>
-          </div>
+          <h1>英语卡片</h1>
           <label class="group-filter">
             <span>分组</span>
             <select id="groupFilter">
@@ -90,8 +87,12 @@
             </select>
           </label>
           <label class="settings-field" for="speechRateInput">
-            语速 <span id="speechRateValue">0.90</span>
-            <input id="speechRateInput" type="range" min="0.75" max="1.05" step="0.01" value="0.90" />
+            语速 <span id="speechRateValue">0.82</span>
+            <input id="speechRateInput" type="range" min="0.65" max="1.00" step="0.01" value="0.82" />
+          </label>
+          <label class="settings-check" for="clearSpeechInput">
+            <input id="clearSpeechInput" type="checkbox" checked />
+            清晰模式
           </label>
         </section>
 

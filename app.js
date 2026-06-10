@@ -2,9 +2,10 @@ const DB_NAME = "kindergarten-english-cards";
 const DB_VERSION = 1;
 const STORE_NAME = "cards";
 const DEFAULT_GROUP = "默认";
-const ACCENT_STORAGE_KEY = "kindergarten-english-accent-v2";
-const VOICE_STORAGE_KEY = "kindergarten-english-voice-v2";
-const RATE_STORAGE_KEY = "kindergarten-speech-rate-v2";
+const ACCENT_STORAGE_KEY = "kindergarten-english-accent-v3";
+const VOICE_STORAGE_KEY = "kindergarten-english-voice-v3";
+const RATE_STORAGE_KEY = "kindergarten-speech-rate-v3";
+const CLEAR_SPEECH_STORAGE_KEY = "kindergarten-clear-speech-v1";
 
 const WORD_DICTIONARY = {
   apple: "苹果",
@@ -202,6 +203,7 @@ const elements = {
   englishVoiceSelect: document.getElementById("englishVoiceSelect"),
   speechRateInput: document.getElementById("speechRateInput"),
   speechRateValue: document.getElementById("speechRateValue"),
+  clearSpeechInput: document.getElementById("clearSpeechInput"),
   settingsButton: document.getElementById("settingsButton"),
   closeSettingsButton: document.getElementById("closeSettingsButton"),
   settingsPanel: document.getElementById("settingsPanel"),
@@ -394,6 +396,7 @@ function render() {
   elements.englishAccentSelect.disabled = false;
   elements.englishVoiceSelect.disabled = false;
   elements.speechRateInput.disabled = false;
+  elements.clearSpeechInput.disabled = false;
   elements.groupFilter.disabled = state.cards.length === 0;
   elements.cardForm.querySelector("button[type='submit']").disabled = !state.storageReady || state.isRecognizing;
   elements.listTotal.textContent =
@@ -486,8 +489,9 @@ function scoreVoice(voice, lang) {
 
   if (/natural|premium|enhanced|online/.test(name)) score += 24;
   if (/google|microsoft|apple/.test(name)) score += 18;
-  if (/aria|jenny|guy|samantha|daniel|serena|libby|susan|karen/.test(name)) score += 14;
+  if (/aria|jenny|guy|samantha|daniel|serena|libby|susan|karen|ava|emma|brian|ryan|sonia/.test(name)) score += 14;
   if (/zira|david/.test(name)) score += 6;
+  if (/compact|novelty|whisper|bad news|bells|boing|bubbles/.test(name)) score -= 30;
   if (voice.localService) score += 4;
 
   return score;
@@ -520,7 +524,11 @@ function getEnglishAccent() {
 
 function getSpeechRate() {
   const rate = Number.parseFloat(elements.speechRateInput.value);
-  return Number.isFinite(rate) ? rate : 0.9;
+  return Number.isFinite(rate) ? rate : 0.82;
+}
+
+function isClearSpeechEnabled() {
+  return elements.clearSpeechInput.checked;
 }
 
 function updateSpeechRateLabel() {
@@ -531,6 +539,7 @@ function saveSpeechSettings() {
   localStorage.setItem(ACCENT_STORAGE_KEY, getEnglishAccent());
   localStorage.setItem(VOICE_STORAGE_KEY, elements.englishVoiceSelect.value || "auto");
   localStorage.setItem(RATE_STORAGE_KEY, String(getSpeechRate()));
+  localStorage.setItem(CLEAR_SPEECH_STORAGE_KEY, isClearSpeechEnabled() ? "1" : "0");
   updateSpeechRateLabel();
 }
 
@@ -542,8 +551,11 @@ function loadEnglishAccent() {
 
   const savedRate = Number.parseFloat(localStorage.getItem(RATE_STORAGE_KEY));
   if (Number.isFinite(savedRate)) {
-    elements.speechRateInput.value = String(Math.min(Math.max(savedRate, 0.75), 1.05));
+    elements.speechRateInput.value = String(Math.min(Math.max(savedRate, 0.65), 1));
   }
+
+  const savedClearSpeech = localStorage.getItem(CLEAR_SPEECH_STORAGE_KEY);
+  elements.clearSpeechInput.checked = savedClearSpeech !== "0";
 
   updateSpeechRateLabel();
   populateEnglishVoiceSelect();
@@ -573,16 +585,33 @@ function populateEnglishVoiceSelect() {
   elements.englishVoiceSelect.value = voices.some((voice) => voice.voiceURI === currentValue) ? currentValue : "auto";
 }
 
+function normalizeEnglishForSpeech(text) {
+  return String(text || "")
+    .replace(/[_/\\]+/g, " ")
+    .replace(/[-]+/g, " ")
+    .replace(/[^A-Za-z'\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
 function speak(text, lang) {
   if (!text || !("speechSynthesis" in window)) {
     return;
   }
 
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
+  const speechText = lang.startsWith("en") && isClearSpeechEnabled() ? normalizeEnglishForSpeech(text) : text;
+  if (!speechText) {
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(speechText);
   utterance.lang = lang;
-  utterance.rate = lang.startsWith("en") ? getSpeechRate() : 0.9;
-  utterance.pitch = 1;
+  utterance.rate = lang.startsWith("en")
+    ? (isClearSpeechEnabled() ? Math.min(getSpeechRate(), 0.84) : getSpeechRate())
+    : 0.9;
+  utterance.pitch = lang.startsWith("en") ? 0.98 : 1;
   utterance.volume = 1;
 
   const preferredVoiceURI = lang.startsWith("en") ? elements.englishVoiceSelect.value : "auto";
@@ -874,6 +903,7 @@ function bindEvents() {
   });
   elements.englishVoiceSelect.addEventListener("change", saveSpeechSettings);
   elements.speechRateInput.addEventListener("input", saveSpeechSettings);
+  elements.clearSpeechInput.addEventListener("change", saveSpeechSettings);
   elements.settingsButton.addEventListener("click", openSettings);
   elements.closeSettingsButton.addEventListener("click", closeSettings);
   elements.clearButton.addEventListener("click", clearCards);
