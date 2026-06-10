@@ -1032,7 +1032,7 @@ button:disabled {
 
   .workspace {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(156px, 22vw);
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 32vw);
     grid-template-rows: auto minmax(0, 1fr);
     min-height: calc(100svh - 12px);
   }
@@ -1082,7 +1082,7 @@ button:disabled {
   }
 
   .study-card {
-    grid-template-columns: minmax(0, 1fr) minmax(156px, 22vw);
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 32vw);
     grid-template-rows: auto;
     align-items: center;
     gap: 8px;
@@ -1140,14 +1140,14 @@ button:disabled {
     grid-row: 2;
     z-index: 3;
     align-self: end;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     align-content: end;
-    gap: 8px;
+    gap: 7px;
     padding: 0 10px 8px 0;
   }
 
   .speak-button {
-    min-height: 48px;
+    min-height: 44px;
   }
 
   .button-main {
@@ -1159,7 +1159,7 @@ button:disabled {
   }
 
   .test-overlay {
-    grid-template-columns: minmax(0, 1fr) minmax(156px, 22vw);
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 32vw);
     grid-template-rows: auto minmax(0, 1fr);
     gap: 8px;
     padding: 8px;
@@ -1190,7 +1190,7 @@ button:disabled {
   }
 
   .test-card {
-    grid-template-columns: minmax(0, 1fr) minmax(156px, 22vw);
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 32vw);
     grid-template-rows: auto;
     align-items: center;
     gap: 8px;
@@ -1246,12 +1246,12 @@ button:disabled {
     grid-row: 2;
     z-index: 3;
     align-self: end;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     align-content: end;
-    gap: 8px;
+    gap: 7px;
   }
 
   .test-footer .speak-button {
-    min-height: 48px;
+    min-height: 44px;
   }
 }
