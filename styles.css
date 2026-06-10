@@ -104,6 +104,7 @@ h1 {
 }
 
 .settings-button,
+.test-button,
 .nav-button {
   display: inline-grid;
   place-items: center;
@@ -118,6 +119,14 @@ h1 {
   width: 60px;
   min-height: 38px;
   border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.test-button {
+  width: 60px;
+  min-height: 38px;
+  border-radius: 8px;
+  background: var(--rose);
   font-size: 0.9rem;
 }
 
@@ -264,6 +273,147 @@ button:disabled {
   transform: translateX(0);
 }
 
+.test-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 18px;
+  background: linear-gradient(135deg, #f7f4eb 0%, #eaf5ee 52%, #edf4fb 100%);
+  transform: translateY(100%);
+  transition: transform 180ms ease;
+}
+
+.test-overlay.open {
+  transform: translateY(0);
+}
+
+.test-header {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) 120px 88px 88px;
+  gap: 10px;
+  align-items: end;
+}
+
+.test-field {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.test-field select,
+.test-field input {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+}
+
+.test-status {
+  min-height: 28px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.test-main {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 64px;
+  gap: 14px;
+  align-items: center;
+  min-height: 0;
+}
+
+.test-card {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+  height: 100%;
+  max-width: 980px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.test-photo {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(52, 61, 70, 0.12);
+}
+
+.test-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.test-words {
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 254, 250, 0.96);
+  text-align: center;
+}
+
+.test-words p {
+  margin-bottom: 3px;
+}
+
+#testCardCount {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+#testEnglishWord {
+  margin-bottom: 3px;
+  overflow-wrap: anywhere;
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  line-height: 1.05;
+}
+
+#testChineseWord {
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+  color: var(--green-dark);
+  font-size: clamp(1.05rem, 4vw, 1.7rem);
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+.test-nav {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(36, 49, 61, 0.18);
+}
+
+.test-footer {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) minmax(120px, 180px) 120px;
+  justify-content: center;
+  gap: 10px;
+}
+
 .panel-header,
 .management-header,
 .list-header {
@@ -330,6 +480,7 @@ button:disabled {
 }
 
 .settings-field select,
+.settings-field input[type="number"],
 .settings-field input[type="range"] {
   min-height: 44px;
   border: 1px solid var(--line);
@@ -343,6 +494,12 @@ button:disabled {
 .settings-field input[type="range"] {
   padding: 0;
   accent-color: var(--blue);
+}
+
+.test-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .card-form {
@@ -373,6 +530,7 @@ button:disabled {
 .card-form input[type="text"]:focus,
 .group-filter select:focus,
 .settings-field select:focus,
+.settings-field input[type="number"]:focus,
 .settings-field input[type="range"]:focus,
 .settings-check input:focus,
 .upload-box:focus-within {
@@ -656,7 +814,7 @@ button:disabled {
 
   h1 {
     flex: 0 0 auto;
-    font-size: 1.32rem;
+    font-size: 1.2rem;
   }
 
   .group-filter {
@@ -681,15 +839,17 @@ button:disabled {
   }
 
   .settings-button,
+  .test-button,
   .nav-button {
     width: 46px;
     font-size: 1.55rem;
   }
 
-  .settings-button {
-    width: 52px;
+  .settings-button,
+  .test-button {
+    width: 48px;
     min-height: 34px;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
   }
 
   .speak-button {
@@ -769,6 +929,77 @@ button:disabled {
     max-height: 100%;
     object-fit: contain;
   }
+
+  .test-overlay {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .test-header {
+    grid-template-columns: minmax(0, 1fr) 78px 54px 54px;
+    gap: 7px;
+  }
+
+  .test-field {
+    font-size: 0.74rem;
+  }
+
+  .test-field select,
+  .test-field input {
+    min-height: 34px;
+    padding: 0 6px;
+  }
+
+  .test-header .primary-button,
+  .test-header .text-button {
+    min-height: 34px;
+    padding: 0 4px;
+    font-size: 0.78rem;
+  }
+
+  .test-status {
+    min-height: 20px;
+    font-size: 0.8rem;
+  }
+
+  .test-main {
+    position: relative;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .test-card {
+    width: 100%;
+  }
+
+  .test-nav {
+    position: absolute;
+    z-index: 2;
+    width: 46px;
+    font-size: 1.55rem;
+  }
+
+  .test-nav.previous {
+    left: 4px;
+  }
+
+  .test-nav.next {
+    right: 4px;
+  }
+
+  .test-photo {
+    min-height: 0;
+  }
+
+  .test-footer {
+    grid-template-columns: 1fr 1fr 92px;
+    gap: 7px;
+  }
+
+  .test-footer .speak-button,
+  .test-footer .text-button {
+    min-height: 46px;
+  }
 }
 
 @media (max-width: 560px) and (orientation: portrait) {
@@ -793,5 +1024,9 @@ button:disabled {
 
   #chineseWord {
     font-size: clamp(0.95rem, 5vw, 1.25rem);
+  }
+
+  .test-photo {
+    height: min(66svh, 560px);
   }
 }

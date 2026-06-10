@@ -2,10 +2,11 @@ const DB_NAME = "kindergarten-english-cards";
 const DB_VERSION = 1;
 const STORE_NAME = "cards";
 const DEFAULT_GROUP = "默认";
-const ACCENT_STORAGE_KEY = "kindergarten-english-accent-v3";
-const VOICE_STORAGE_KEY = "kindergarten-english-voice-v3";
+const ACCENT_STORAGE_KEY = "kindergarten-english-accent-v4";
+const VOICE_STORAGE_KEY = "kindergarten-english-voice-v4";
 const RATE_STORAGE_KEY = "kindergarten-speech-rate-v3";
 const CLEAR_SPEECH_STORAGE_KEY = "kindergarten-clear-speech-v1";
+const CURRENT_GROUP_STORAGE_KEY = "kindergarten-current-group-v1";
 
 const WORD_DICTIONARY = {
   apple: "苹果",
@@ -157,6 +158,9 @@ const state = {
   db: null,
   storageReady: true,
   isRecognizing: false,
+  isTestMode: false,
+  testCards: [],
+  testIndex: 0,
 };
 
 function getLocalCards() {
@@ -204,6 +208,24 @@ const elements = {
   speechRateInput: document.getElementById("speechRateInput"),
   speechRateValue: document.getElementById("speechRateValue"),
   clearSpeechInput: document.getElementById("clearSpeechInput"),
+  openTestButton: document.getElementById("openTestButton"),
+  testOverlay: document.getElementById("testOverlay"),
+  testRangeSelect: document.getElementById("testRangeSelect"),
+  testCountInput: document.getElementById("testCountInput"),
+  testCountLimit: document.getElementById("testCountLimit"),
+  startTestButton: document.getElementById("startTestButton"),
+  stopTestButton: document.getElementById("stopTestButton"),
+  closeTestButton: document.getElementById("closeTestButton"),
+  testStatus: document.getElementById("testStatus"),
+  testPreviousButton: document.getElementById("testPreviousButton"),
+  testNextButton: document.getElementById("testNextButton"),
+  testSpeakEnglishButton: document.getElementById("testSpeakEnglishButton"),
+  testSpeakChineseButton: document.getElementById("testSpeakChineseButton"),
+  testCardImage: document.getElementById("testCardImage"),
+  testEmptyIllustration: document.getElementById("testEmptyIllustration"),
+  testCardCount: document.getElementById("testCardCount"),
+  testEnglishWord: document.getElementById("testEnglishWord"),
+  testChineseWord: document.getElementById("testChineseWord"),
   settingsButton: document.getElementById("settingsButton"),
   closeSettingsButton: document.getElementById("closeSettingsButton"),
   settingsPanel: document.getElementById("settingsPanel"),
@@ -228,6 +250,17 @@ function normalizeGroup(value) {
 function getGroups() {
   const groups = new Set(state.cards.map((card) => normalizeGroup(card.group || DEFAULT_GROUP)));
   return [...groups].sort((a, b) => a.localeCompare(b, "zh-CN"));
+}
+
+function saveCurrentGroup() {
+  localStorage.setItem(CURRENT_GROUP_STORAGE_KEY, state.currentGroup);
+}
+
+function loadCurrentGroup() {
+  const savedGroup = localStorage.getItem(CURRENT_GROUP_STORAGE_KEY);
+  if (savedGroup) {
+    state.currentGroup = savedGroup;
+  }
 }
 
 function getVisibleCards() {
@@ -332,6 +365,7 @@ function renderGroupControls() {
   if (!selectedExists) {
     state.currentGroup = "all";
     state.currentIndex = 0;
+    saveCurrentGroup();
   }
 
   elements.groupFilter.replaceChildren();
@@ -359,8 +393,68 @@ function renderGroupControls() {
   );
 }
 
+function getCardsForTestRange(range) {
+  if (range === "all") {
+    return state.cards;
+  }
+
+  return state.cards.filter((card) => normalizeGroup(card.group || DEFAULT_GROUP) === range);
+}
+
+function shuffleCards(cards) {
+  const result = [...cards];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [result[index], result[randomIndex]] = [result[randomIndex], result[index]];
+  }
+  return result;
+}
+
+function renderTestControls() {
+  const groups = getGroups();
+  const currentRange = elements.testRangeSelect.value || "all";
+
+  elements.testRangeSelect.replaceChildren();
+
+  const allOption = document.createElement("option");
+  allOption.value = "all";
+  allOption.textContent = `全部 (${state.cards.length})`;
+  elements.testRangeSelect.append(allOption);
+
+  groups.forEach((group) => {
+    const option = document.createElement("option");
+    const count = getCardsForTestRange(group).length;
+    option.value = group;
+    option.textContent = `${group} (${count})`;
+    elements.testRangeSelect.append(option);
+  });
+
+  elements.testRangeSelect.value =
+    currentRange === "all" || groups.includes(currentRange) ? currentRange : "all";
+
+  const availableCount = getCardsForTestRange(elements.testRangeSelect.value).length;
+  const maxCount = Math.max(availableCount, 1);
+  const requestedCount = Number.parseInt(elements.testCountInput.value, 10);
+  const normalizedCount = Number.isFinite(requestedCount)
+    ? Math.min(Math.max(requestedCount, 1), maxCount)
+    : 1;
+
+  elements.testCountInput.min = "1";
+  elements.testCountInput.max = String(maxCount);
+  elements.testCountInput.value = availableCount > 0 ? String(normalizedCount) : "1";
+  elements.testCountInput.disabled = availableCount === 0;
+  elements.startTestButton.disabled = availableCount === 0;
+  elements.stopTestButton.disabled = !state.isTestMode;
+  elements.testCountLimit.textContent = `最多 ${availableCount}`;
+  elements.testStatus.textContent = state.isTestMode
+    ? `测试中：${state.testCards.length} 张`
+    : "选择分组和数量后开始测试。";
+  renderTestCard();
+}
+
 function render() {
   renderGroupControls();
+  renderTestControls();
   clampCurrentIndex();
 
   const visibleCards = getVisibleCards();
@@ -471,6 +565,46 @@ function moveCard(direction) {
   render();
 }
 
+function getCurrentTestCard() {
+  return state.testCards[state.testIndex];
+}
+
+function renderTestCard() {
+  const card = getCurrentTestCard();
+  const hasCard = Boolean(card);
+
+  elements.testCardCount.textContent = hasCard ? `${state.testIndex + 1} / ${state.testCards.length}` : "0 / 0";
+  elements.testEnglishWord.textContent = hasCard ? card.english : "点击开始";
+  elements.testChineseWord.textContent = hasCard ? card.chinese : "随机显示测试卡片";
+
+  if (hasCard) {
+    elements.testCardImage.src = card.image;
+    elements.testCardImage.alt = `${card.english}，${card.chinese}`;
+    elements.testCardImage.hidden = false;
+    elements.testEmptyIllustration.hidden = true;
+  } else {
+    elements.testCardImage.removeAttribute("src");
+    elements.testCardImage.alt = "";
+    elements.testCardImage.hidden = true;
+    elements.testEmptyIllustration.hidden = false;
+  }
+
+  const canMove = state.testCards.length > 1;
+  elements.testPreviousButton.disabled = !canMove;
+  elements.testNextButton.disabled = !canMove;
+  elements.testSpeakEnglishButton.disabled = !hasCard;
+  elements.testSpeakChineseButton.disabled = !hasCard;
+}
+
+function moveTestCard(direction) {
+  if (state.testCards.length < 2) {
+    return;
+  }
+
+  state.testIndex = (state.testIndex + direction + state.testCards.length) % state.testCards.length;
+  renderTestCard();
+}
+
 function getVoices() {
   return window.speechSynthesis?.getVoices?.() ?? [];
 }
@@ -519,7 +653,7 @@ function pickVoice(lang, preferredVoiceURI = "auto") {
 }
 
 function getEnglishAccent() {
-  return elements.englishAccentSelect.value || "en-US";
+  return elements.englishAccentSelect.value || "en-GB";
 }
 
 function getSpeechRate() {
@@ -835,6 +969,7 @@ async function handleSubmit(event) {
   state.cards.push(card);
   state.currentGroup = group;
   state.currentIndex = getVisibleCards().length - 1;
+  saveCurrentGroup();
   resetForm();
   render();
 }
@@ -856,6 +991,9 @@ async function deleteCard(cardId) {
   }
 
   state.cards.splice(cardIndex, 1);
+  if (state.isTestMode) {
+    stopTest();
+  }
   clampCurrentIndex();
   render();
 }
@@ -879,7 +1017,52 @@ async function clearCards() {
   state.cards = getLocalCards();
   state.currentIndex = 0;
   state.currentGroup = "all";
+  saveCurrentGroup();
+  state.isTestMode = false;
+  state.testCards = [];
+  state.testIndex = 0;
   render();
+}
+
+function startTest() {
+  const candidates = getCardsForTestRange(elements.testRangeSelect.value);
+  if (candidates.length === 0) {
+    return;
+  }
+
+  const requestedCount = Number.parseInt(elements.testCountInput.value, 10);
+  const count = Number.isFinite(requestedCount)
+    ? Math.min(Math.max(requestedCount, 1), candidates.length)
+    : 1;
+
+  state.testCards = shuffleCards(candidates).slice(0, count);
+  state.isTestMode = true;
+  state.testIndex = 0;
+  renderTestControls();
+}
+
+function stopTest() {
+  state.isTestMode = false;
+  state.testCards = [];
+  state.testIndex = 0;
+  renderTestControls();
+}
+
+function openTest() {
+  const groups = getGroups();
+  const preferredRange = state.currentGroup === "all" || groups.includes(state.currentGroup) ? state.currentGroup : "all";
+  elements.testRangeSelect.value = preferredRange;
+  elements.testOverlay.classList.add("open");
+  elements.testOverlay.setAttribute("aria-hidden", "false");
+  renderTestControls();
+  elements.testRangeSelect.value = preferredRange;
+  renderTestControls();
+}
+
+function closeTest() {
+  stopTest();
+  elements.testOverlay.classList.remove("open");
+  elements.testOverlay.setAttribute("aria-hidden", "true");
 }
 
 function openSettings() {
@@ -904,6 +1087,16 @@ function bindEvents() {
   elements.englishVoiceSelect.addEventListener("change", saveSpeechSettings);
   elements.speechRateInput.addEventListener("input", saveSpeechSettings);
   elements.clearSpeechInput.addEventListener("change", saveSpeechSettings);
+  elements.testRangeSelect.addEventListener("change", renderTestControls);
+  elements.testCountInput.addEventListener("input", renderTestControls);
+  elements.startTestButton.addEventListener("click", startTest);
+  elements.stopTestButton.addEventListener("click", stopTest);
+  elements.openTestButton.addEventListener("click", openTest);
+  elements.closeTestButton.addEventListener("click", closeTest);
+  elements.testPreviousButton.addEventListener("click", () => moveTestCard(-1));
+  elements.testNextButton.addEventListener("click", () => moveTestCard(1));
+  elements.testSpeakEnglishButton.addEventListener("click", () => speak(getCurrentTestCard()?.english, getEnglishAccent()));
+  elements.testSpeakChineseButton.addEventListener("click", () => speak(getCurrentTestCard()?.chinese, "zh-CN"));
   elements.settingsButton.addEventListener("click", openSettings);
   elements.closeSettingsButton.addEventListener("click", closeSettings);
   elements.clearButton.addEventListener("click", clearCards);
@@ -911,12 +1104,17 @@ function bindEvents() {
   elements.cardForm.addEventListener("submit", handleSubmit);
   elements.groupFilter.addEventListener("change", () => {
     state.currentGroup = elements.groupFilter.value;
+    saveCurrentGroup();
+    state.isTestMode = false;
+    state.testCards = [];
+    state.testIndex = 0;
     state.currentIndex = 0;
     resetForm();
     render();
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
+      closeTest();
       closeSettings();
     }
   });
@@ -938,6 +1136,7 @@ async function start() {
 
   bindEvents();
   loadEnglishAccent();
+  loadCurrentGroup();
   setDefaultGroupForForm();
   render();
 }
