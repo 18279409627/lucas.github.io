@@ -1023,3 +1023,193 @@ button:disabled {
     width: 100%;
   }
 }
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .app-shell {
+    min-height: 100svh;
+    padding: 6px;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(132px, 18vw);
+    grid-template-rows: auto minmax(0, 1fr);
+    min-height: calc(100svh - 12px);
+  }
+
+  .topbar {
+    grid-column: 1 / -1;
+    gap: 8px;
+    padding: 8px 10px 4px;
+  }
+
+  h1 {
+    flex: 0 1 auto;
+    font-size: clamp(1rem, 2.7vw, 1.25rem);
+    white-space: nowrap;
+  }
+
+  .group-filter {
+    flex: 1;
+    min-width: 0;
+    gap: 0;
+    font-size: 0.76rem;
+  }
+
+  .group-filter span {
+    display: none;
+  }
+
+  .group-filter select {
+    min-height: 32px;
+    padding-left: 8px;
+  }
+
+  .settings-button,
+  .test-button {
+    width: 48px;
+    min-height: 32px;
+    font-size: 0.8rem;
+  }
+
+  .card-stage {
+    grid-column: 1;
+    min-height: 0;
+    padding: 4px 8px 8px 10px;
+  }
+
+  .study-card {
+    width: min(100%, 52svh);
+    min-height: 0;
+  }
+
+  .photo-panel {
+    padding: 5px;
+  }
+
+  .word-panel {
+    grid-template-columns: 38px minmax(0, 1fr) 38px;
+    gap: 7px;
+    margin-top: 5px;
+    padding: 5px 8px;
+  }
+
+  .nav-button {
+    width: 38px;
+    font-size: 1.35rem;
+    background: rgba(36, 49, 61, 0.28);
+  }
+
+  .card-count {
+    margin-bottom: 1px;
+    font-size: 0.66rem;
+  }
+
+  #englishWord {
+    margin-bottom: 1px;
+    font-size: clamp(1rem, 3.1vw, 1.35rem);
+    line-height: 1.03;
+  }
+
+  #chineseWord {
+    font-size: clamp(0.9rem, 2.5vw, 1.12rem);
+    line-height: 1.04;
+  }
+
+  .controls {
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 8px;
+    padding: 4px 10px 8px 0;
+  }
+
+  .speak-button {
+    min-height: 48px;
+  }
+
+  .button-main {
+    font-size: 1rem;
+  }
+
+  .button-sub {
+    font-size: 0.74rem;
+  }
+
+  .test-overlay {
+    grid-template-columns: minmax(0, 1fr) minmax(132px, 18vw);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .test-header {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) 58px;
+  }
+
+  .test-status {
+    min-height: 24px;
+    font-size: 0.78rem;
+  }
+
+  .test-header .text-button {
+    min-height: 32px;
+    padding: 0 6px;
+    font-size: 0.78rem;
+  }
+
+  .test-main {
+    grid-column: 1;
+    min-height: 0;
+  }
+
+  .test-card {
+    width: min(100%, 54svh);
+  }
+
+  .test-photo {
+    padding: 5px;
+  }
+
+  .test-words {
+    grid-template-columns: 38px minmax(0, 1fr) 38px;
+    gap: 7px;
+    margin-top: 5px;
+    padding: 5px 8px;
+  }
+
+  .test-nav {
+    width: 38px;
+    font-size: 1.35rem;
+    background: rgba(36, 49, 61, 0.28);
+  }
+
+  #testCardCount {
+    font-size: 0.66rem;
+  }
+
+  #testEnglishWord {
+    margin-bottom: 1px;
+    font-size: clamp(1rem, 3.1vw, 1.35rem);
+    line-height: 1.03;
+  }
+
+  #testChineseWord {
+    font-size: clamp(0.9rem, 2.5vw, 1.12rem);
+    line-height: 1.04;
+  }
+
+  .test-footer {
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 8px;
+  }
+
+  .test-footer .speak-button {
+    min-height: 48px;
+  }
+}
