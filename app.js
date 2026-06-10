@@ -155,6 +155,36 @@ const state = {
   isRecognizing: false,
 };
 
+function getLocalCards() {
+  const groups = Array.isArray(window.LOCAL_CARD_GROUPS) ? window.LOCAL_CARD_GROUPS : [];
+  const cards = [];
+
+  groups.forEach((groupEntry, groupIndex) => {
+    const group = normalizeGroup(String(groupEntry.group || DEFAULT_GROUP));
+    const groupCards = Array.isArray(groupEntry.cards) ? groupEntry.cards : [];
+
+    groupCards.forEach((cardEntry, cardIndex) => {
+      const english = String(cardEntry.english || "").trim();
+      const image = String(cardEntry.image || "").trim();
+      if (!english || !image) {
+        return;
+      }
+
+      cards.push({
+        id: `local:${groupIndex}:${cardIndex}:${english}:${image}`,
+        english,
+        chinese: String(cardEntry.chinese || translateFromDictionary(english) || "").trim() || "未翻译",
+        group,
+        image,
+        createdAt: -1000000 + groupIndex * 1000 + cardIndex,
+        source: "local",
+      });
+    });
+  });
+
+  return cards;
+}
+
 const elements = {
   cardImage: document.getElementById("cardImage"),
   emptyIllustration: document.getElementById("emptyIllustration"),
@@ -232,8 +262,13 @@ function loadCards() {
     const request = getStore().getAll();
 
     request.addEventListener("success", () => {
-      state.cards = request.result
-        .map((card) => ({ ...card, group: normalizeGroup(card.group || DEFAULT_GROUP) }))
+      const savedCards = request.result.map((card) => ({
+        ...card,
+        group: normalizeGroup(card.group || DEFAULT_GROUP),
+        source: card.source || "user",
+      }));
+
+      state.cards = [...getLocalCards(), ...savedCards]
         .sort((a, b) => a.createdAt - b.createdAt);
       resolve();
     });
@@ -341,7 +376,8 @@ function render() {
   elements.nextButton.disabled = visibleCards.length < 2;
   elements.speakEnglishButton.disabled = !hasCards;
   elements.speakChineseButton.disabled = !hasCards;
-  elements.clearButton.disabled = state.cards.length === 0;
+  elements.clearButton.disabled = !state.cards.some((cardItem) => cardItem.source !== "local");
+  elements.clearButton.textContent = "清空上传";
   elements.photoInput.disabled = !state.storageReady || state.isRecognizing;
   elements.groupInput.disabled = !state.storageReady;
   elements.englishInput.disabled = !state.storageReady;
@@ -385,15 +421,24 @@ function renderList(visibleCards) {
     english.textContent = card.english;
 
     const chinese = document.createElement("span");
-    chinese.textContent = `${card.chinese} · ${normalizeGroup(card.group || DEFAULT_GROUP)}`;
+    chinese.textContent = `${card.chinese} · ${normalizeGroup(card.group || DEFAULT_GROUP)}${
+      card.source === "local" ? " · 本地" : ""
+    }`;
 
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "delete-button";
-    deleteButton.setAttribute("aria-label", `删除 ${card.english}`);
-    deleteButton.title = "删除";
-    deleteButton.textContent = "×";
-    deleteButton.addEventListener("click", () => deleteCard(card.id));
+    if (card.source === "local") {
+      deleteButton.disabled = true;
+      deleteButton.setAttribute("aria-label", `${card.english} 是本地资源`);
+      deleteButton.title = "本地资源";
+      deleteButton.textContent = "本";
+    } else {
+      deleteButton.setAttribute("aria-label", `删除 ${card.english}`);
+      deleteButton.title = "删除";
+      deleteButton.textContent = "×";
+      deleteButton.addEventListener("click", () => deleteCard(card.id));
+    }
 
     text.append(english, chinese);
     item.append(thumbnail, text, deleteButton);
@@ -639,6 +684,7 @@ async function handleSubmit(event) {
     group,
     image: state.pendingImage,
     createdAt: Date.now(),
+    source: "user",
   };
 
   try {
@@ -661,6 +707,10 @@ async function deleteCard(cardId) {
     return;
   }
 
+  if (state.cards[cardIndex].source === "local") {
+    return;
+  }
+
   try {
     await removeCard(cardId);
   } catch {
@@ -673,11 +723,11 @@ async function deleteCard(cardId) {
 }
 
 async function clearCards() {
-  if (state.cards.length === 0) {
+  if (!state.cards.some((card) => card.source !== "local")) {
     return;
   }
 
-  const confirmed = window.confirm("确定清空所有卡片吗？");
+  const confirmed = window.confirm("确定清空所有拍照上传的卡片吗？本地资源不会删除。");
   if (!confirmed) {
     return;
   }
@@ -688,7 +738,7 @@ async function clearCards() {
     return;
   }
 
-  state.cards = [];
+  state.cards = getLocalCards();
   state.currentIndex = 0;
   state.currentGroup = "all";
   render();
@@ -722,7 +772,7 @@ async function start() {
     await loadCards();
   } catch {
     state.storageReady = false;
-    state.cards = [];
+    state.cards = getLocalCards();
     elements.uploadHint.textContent = "当前浏览器无法保存卡片";
   }
 
