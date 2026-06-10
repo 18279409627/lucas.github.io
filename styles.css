@@ -199,9 +199,40 @@ h1 {
 
 .controls {
   display: grid;
-  grid-template-columns: 64px minmax(120px, 1fr) minmax(120px, 1fr) 64px;
+  grid-template-columns: 64px minmax(150px, 1fr) minmax(120px, 1fr) 64px;
   gap: 14px;
   padding: 0 28px 28px;
+}
+
+.english-speech-control {
+  display: grid;
+  grid-template-columns: minmax(74px, 0.45fr) minmax(84px, 0.55fr);
+  grid-template-rows: 22px 1fr;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
+.english-speech-control label {
+  align-self: end;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.english-speech-control select {
+  min-width: 0;
+  min-height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 8px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 800;
+  outline: none;
+}
+
+.english-speech-control .speak-button {
+  grid-column: 1 / -1;
 }
 
 .speak-button,
@@ -300,6 +331,7 @@ button:disabled {
 
 .card-form input[type="text"]:focus,
 .group-filter select:focus,
+.english-speech-control select:focus,
 .upload-box:focus-within {
   border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(51, 120, 212, 0.16);
@@ -519,13 +551,29 @@ button:disabled {
   }
 
   .photo-panel {
-    min-height: 300px;
+    min-height: 0;
     aspect-ratio: 4 / 3;
   }
 
   .word-panel {
-    padding: 28px;
+    min-height: 168px;
+    padding: 22px 24px;
     text-align: center;
+  }
+
+  .card-count {
+    margin-bottom: 10px;
+  }
+
+  #englishWord {
+    margin-bottom: 10px;
+    font-size: clamp(2.4rem, 11vw, 4.2rem);
+    line-height: 1.02;
+  }
+
+  #chineseWord {
+    font-size: clamp(1.55rem, 7vw, 2.6rem);
+    line-height: 1.12;
   }
 }
 
@@ -548,7 +596,7 @@ button:disabled {
   }
 
   .controls {
-    grid-template-columns: 54px 1fr 1fr 54px;
+    grid-template-columns: 50px minmax(0, 1.08fr) minmax(0, 0.92fr) 50px;
     gap: 8px;
   }
 
@@ -562,6 +610,22 @@ button:disabled {
     min-height: 58px;
   }
 
+  .english-speech-control {
+    grid-template-columns: minmax(58px, 0.45fr) minmax(58px, 0.55fr);
+    grid-template-rows: 18px 1fr;
+    gap: 3px 5px;
+  }
+
+  .english-speech-control label {
+    font-size: 0.72rem;
+  }
+
+  .english-speech-control select {
+    min-height: 26px;
+    padding: 0 4px;
+    font-size: 0.78rem;
+  }
+
   .button-main {
     font-size: 1rem;
   }
@@ -572,5 +636,33 @@ button:disabled {
 
   .side-panel {
     padding: 16px;
+  }
+
+  .card-stage {
+    padding-top: 12px;
+    padding-bottom: 18px;
+  }
+
+  .study-card {
+    width: 100%;
+  }
+
+  .word-panel {
+    min-height: 138px;
+    padding: 16px 14px 18px;
+  }
+
+  .card-count {
+    margin-bottom: 8px;
+    font-size: 0.82rem;
+  }
+
+  #englishWord {
+    margin-bottom: 8px;
+    font-size: clamp(2rem, 12vw, 3.2rem);
+  }
+
+  #chineseWord {
+    font-size: clamp(1.35rem, 7.5vw, 2.1rem);
   }
 }

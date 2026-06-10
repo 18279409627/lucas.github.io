@@ -54,10 +54,17 @@
           <button class="nav-button" id="previousButton" type="button" aria-label="上一张" title="上一张">
             <span aria-hidden="true">&#8592;</span>
           </button>
-          <button class="speak-button english" id="speakEnglishButton" type="button">
-            <span class="button-main">English</span>
-            <span class="button-sub">读英文</span>
-          </button>
+          <div class="english-speech-control">
+            <label for="englishAccentSelect">英文发音</label>
+            <select id="englishAccentSelect">
+              <option value="en-US">美式</option>
+              <option value="en-GB">英式</option>
+            </select>
+            <button class="speak-button english" id="speakEnglishButton" type="button">
+              <span class="button-main">English</span>
+              <span class="button-sub">读英文</span>
+            </button>
+          </div>
           <button class="speak-button chinese" id="speakChineseButton" type="button">
             <span class="button-main">中文</span>
             <span class="button-sub">读中文</span>
