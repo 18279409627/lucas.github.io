@@ -26,7 +26,10 @@
         </header>
 
         <section class="card-stage" aria-live="polite">
-          <div class="study-card" id="studyCard">
+          <button class="nav-button previous" id="previousButton" type="button" aria-label="上一张" title="上一张">
+            <span aria-hidden="true">&#8592;</span>
+          </button>
+          <article class="study-card" id="studyCard">
             <div class="photo-panel" id="photoPanel">
               <img id="cardImage" alt="" hidden />
               <div class="empty-illustration" id="emptyIllustration" aria-hidden="true">
@@ -45,13 +48,13 @@
               <h2 id="englishWord">先添加一张卡片</h2>
               <p id="chineseWord">拍照上传图片，再填写英文和中文</p>
             </div>
-          </div>
+          </article>
+          <button class="nav-button next" id="nextButton" type="button" aria-label="下一张" title="下一张">
+            <span aria-hidden="true">&#8594;</span>
+          </button>
         </section>
 
         <section class="controls" aria-label="卡片操作">
-          <button class="nav-button" id="previousButton" type="button" aria-label="上一张" title="上一张">
-            <span aria-hidden="true">&#8592;</span>
-          </button>
           <button class="speak-button english" id="speakEnglishButton" type="button">
             <span class="button-main">English</span>
             <span class="button-sub">读英文</span>
@@ -59,9 +62,6 @@
           <button class="speak-button chinese" id="speakChineseButton" type="button">
             <span class="button-main">中文</span>
             <span class="button-sub">读中文</span>
-          </button>
-          <button class="nav-button" id="nextButton" type="button" aria-label="下一张" title="下一张">
-            <span aria-hidden="true">&#8594;</span>
           </button>
         </section>
       </section>
@@ -141,21 +141,9 @@
 
       <section class="test-overlay" id="testOverlay" aria-label="测试模式" aria-hidden="true">
         <header class="test-header">
-          <label class="test-field" for="testRangeSelect">
-            分组
-            <select id="testRangeSelect">
-              <option value="all">全部</option>
-            </select>
-          </label>
-          <label class="test-field" for="testCountInput">
-            数量 <span id="testCountLimit">最多 0</span>
-            <input id="testCountInput" type="number" min="1" value="1" />
-          </label>
-          <button class="primary-button" id="startTestButton" type="button">开始</button>
+          <div class="test-status" id="testStatus">测试</div>
           <button class="text-button" id="closeTestButton" type="button">关闭</button>
         </header>
-
-        <div class="test-status" id="testStatus">选择分组和数量后开始测试。</div>
 
         <main class="test-main">
           <button class="test-nav previous" id="testPreviousButton" type="button" aria-label="上一张">&#8592;</button>
@@ -174,8 +162,8 @@
             </div>
             <div class="test-words">
               <p id="testCardCount">0 / 0</p>
-              <h2 id="testEnglishWord">点击开始</h2>
-              <p id="testChineseWord">随机显示测试卡片</p>
+              <h2 id="testEnglishWord">暂无卡片</h2>
+              <p id="testChineseWord">请先选择有卡片的分组</p>
             </div>
           </article>
           <button class="test-nav next" id="testNextButton" type="button" aria-label="下一张">&#8594;</button>
@@ -190,7 +178,6 @@
             <span class="button-main">中文</span>
             <span class="button-sub">读中文</span>
           </button>
-          <button class="text-button" id="stopTestButton" type="button">重新选择</button>
         </footer>
       </section>
     </main>

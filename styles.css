@@ -11,6 +11,9 @@
   --yellow: #ffd36b;
   --rose: #e9617a;
   --shadow: 0 18px 45px rgba(52, 61, 70, 0.15);
+  --card-frame-ratio: 3 / 4;
+  --study-frame-width: min(100%, 900px, 60vh);
+  --test-frame-width: min(100%, 980px, 62vh);
 }
 
 * {
@@ -138,75 +141,81 @@ h1 {
 
 .card-stage {
   display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 56px;
+  gap: 12px;
   align-items: center;
+  min-height: 0;
   padding: 8px 20px 14px;
 }
 
 .study-card {
   display: grid;
-  grid-template-columns: minmax(300px, 1.35fr) minmax(220px, 0.65fr);
-  gap: 0;
-  width: min(1120px, 100%);
-  min-height: min(680px, calc(100vh - 180px));
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+  width: var(--study-frame-width);
   margin: 0 auto;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-  box-shadow: 0 16px 36px rgba(52, 61, 70, 0.12);
 }
 
 .photo-panel {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 460px;
+  aspect-ratio: var(--card-frame-ratio);
+  width: 100%;
+  min-height: 0;
   overflow: hidden;
-  background: #dcefe5;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(52, 61, 70, 0.12);
 }
 
 .photo-panel img {
-  width: 100%;
-  height: 100%;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   background: #fff;
 }
 
 .word-panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-  padding: 34px;
-  background: #fffefa;
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 254, 250, 0.96);
+  text-align: center;
 }
 
 .card-count {
-  margin-bottom: 16px;
+  margin-bottom: 3px;
   color: var(--muted);
-  font-size: 1rem;
+  font-size: 0.78rem;
   font-weight: 700;
 }
 
 #englishWord {
-  margin-bottom: 14px;
+  margin-bottom: 3px;
   overflow-wrap: anywhere;
-  font-size: clamp(3.1rem, 8vw, 6rem);
-  line-height: 0.98;
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  line-height: 1.05;
 }
 
 #chineseWord {
   margin-bottom: 0;
   overflow-wrap: anywhere;
   color: var(--green-dark);
-  font-size: clamp(2rem, 4.8vw, 3.6rem);
+  font-size: clamp(1.05rem, 4vw, 1.7rem);
   font-weight: 800;
   line-height: 1.08;
 }
 
 .controls {
   display: grid;
-  grid-template-columns: 56px minmax(116px, 180px) minmax(116px, 180px) 56px;
+  grid-template-columns: minmax(120px, 180px) minmax(120px, 180px);
   justify-content: center;
   gap: 10px;
   padding: 0 20px 18px;
@@ -278,7 +287,7 @@ button:disabled {
   inset: 0;
   z-index: 30;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 10px;
   padding: 18px;
   background: linear-gradient(135deg, #f7f4eb 0%, #eaf5ee 52%, #edf4fb 100%);
@@ -292,36 +301,18 @@ button:disabled {
 
 .test-header {
   display: grid;
-  grid-template-columns: minmax(130px, 1fr) 120px 88px 88px;
+  grid-template-columns: minmax(0, 1fr) 88px;
   gap: 10px;
-  align-items: end;
-}
-
-.test-field {
-  display: grid;
-  gap: 5px;
-  color: var(--muted);
-  font-size: 0.88rem;
-  font-weight: 800;
-}
-
-.test-field select,
-.test-field input {
-  min-height: 42px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0 10px;
-  background: #fff;
-  color: var(--ink);
-  outline: none;
+  align-items: center;
 }
 
 .test-status {
-  min-height: 28px;
+  min-height: 40px;
   color: var(--muted);
   font-size: 0.95rem;
   font-weight: 800;
-  text-align: center;
+  display: grid;
+  align-items: center;
 }
 
 .test-main {
@@ -336,17 +327,18 @@ button:disabled {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   min-height: 0;
-  height: 100%;
-  max-width: 980px;
-  width: 100%;
+  width: var(--test-frame-width);
   margin: 0 auto;
 }
 
 .test-photo {
   display: grid;
   place-items: center;
+  aspect-ratio: var(--card-frame-ratio);
+  width: 100%;
   min-height: 0;
   overflow: hidden;
+  padding: 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
@@ -354,8 +346,11 @@ button:disabled {
 }
 
 .test-photo img {
-  width: 100%;
-  height: 100%;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
 }
 
@@ -409,7 +404,7 @@ button:disabled {
 
 .test-footer {
   display: grid;
-  grid-template-columns: minmax(120px, 180px) minmax(120px, 180px) 120px;
+  grid-template-columns: minmax(120px, 180px) minmax(120px, 180px);
   justify-content: center;
   gap: 10px;
 }
@@ -494,12 +489,6 @@ button:disabled {
 .settings-field input[type="range"] {
   padding: 0;
   accent-color: var(--blue);
-}
-
-.test-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
 }
 
 .card-form {
@@ -746,34 +735,7 @@ button:disabled {
   }
 
   .study-card {
-    grid-template-columns: 1fr;
-    min-height: 0;
-  }
-
-  .photo-panel {
-    min-height: 0;
-    aspect-ratio: 4 / 3;
-  }
-
-  .word-panel {
-    min-height: 168px;
-    padding: 22px 24px;
-    text-align: center;
-  }
-
-  .card-count {
-    margin-bottom: 10px;
-  }
-
-  #englishWord {
-    margin-bottom: 10px;
-    font-size: clamp(2.4rem, 11vw, 4.2rem);
-    line-height: 1.02;
-  }
-
-  #chineseWord {
-    font-size: clamp(1.55rem, 7vw, 2.6rem);
-    line-height: 1.12;
+    width: min(100%, 66svh);
   }
 }
 
@@ -833,7 +795,7 @@ button:disabled {
   }
 
   .controls {
-    grid-template-columns: 46px minmax(0, 1fr) minmax(0, 1fr) 46px;
+    grid-template-columns: 1fr 1fr;
     gap: 7px;
     padding-bottom: 10px;
   }
@@ -873,6 +835,8 @@ button:disabled {
   }
 
   .card-stage {
+    position: relative;
+    grid-template-columns: 1fr;
     align-items: stretch;
     min-height: 0;
     padding-top: 6px;
@@ -880,23 +844,13 @@ button:disabled {
   }
 
   .study-card {
-    display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
-    width: 100%;
+    width: min(100%, 58svh);
     min-height: 0;
-    overflow: visible;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
   }
 
   .word-panel {
-    min-height: 0;
-    margin-top: 8px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 9px 12px 11px;
-    background: rgba(255, 254, 250, 0.96);
+    margin-top: 6px;
+    padding: 7px 10px 8px;
   }
 
   .card-count {
@@ -917,17 +871,31 @@ button:disabled {
 
   .photo-panel {
     min-height: 0;
-    height: auto;
-    aspect-ratio: auto;
-    border: 1px solid var(--line);
-    border-radius: 8px;
+    aspect-ratio: var(--card-frame-ratio);
+    padding: 6px;
   }
 
   .photo-panel img {
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: auto;
+    max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+  }
+
+  .card-stage .nav-button {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .card-stage .nav-button.previous {
+    left: 14px;
+  }
+
+  .card-stage .nav-button.next {
+    right: 14px;
   }
 
   .test-overlay {
@@ -936,21 +904,10 @@ button:disabled {
   }
 
   .test-header {
-    grid-template-columns: minmax(0, 1fr) 78px 54px 54px;
+    grid-template-columns: minmax(0, 1fr) 58px;
     gap: 7px;
   }
 
-  .test-field {
-    font-size: 0.74rem;
-  }
-
-  .test-field select,
-  .test-field input {
-    min-height: 34px;
-    padding: 0 6px;
-  }
-
-  .test-header .primary-button,
   .test-header .text-button {
     min-height: 34px;
     padding: 0 4px;
@@ -969,7 +926,7 @@ button:disabled {
   }
 
   .test-card {
-    width: 100%;
+    width: min(100%, 64svh);
   }
 
   .test-nav {
@@ -989,10 +946,11 @@ button:disabled {
 
   .test-photo {
     min-height: 0;
+    padding: 6px;
   }
 
   .test-footer {
-    grid-template-columns: 1fr 1fr 92px;
+    grid-template-columns: 1fr 1fr;
     gap: 7px;
   }
 
@@ -1004,12 +962,7 @@ button:disabled {
 
 @media (max-width: 560px) and (orientation: portrait) {
   .photo-panel {
-    height: clamp(360px, 63svh, 560px);
-  }
-
-  .word-panel {
-    margin-top: 6px;
-    padding: 7px 10px 8px;
+    width: 100%;
   }
 
   .card-count {
@@ -1027,6 +980,6 @@ button:disabled {
   }
 
   .test-photo {
-    height: min(66svh, 560px);
+    width: 100%;
   }
 }

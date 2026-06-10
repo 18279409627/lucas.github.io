@@ -210,11 +210,6 @@ const elements = {
   clearSpeechInput: document.getElementById("clearSpeechInput"),
   openTestButton: document.getElementById("openTestButton"),
   testOverlay: document.getElementById("testOverlay"),
-  testRangeSelect: document.getElementById("testRangeSelect"),
-  testCountInput: document.getElementById("testCountInput"),
-  testCountLimit: document.getElementById("testCountLimit"),
-  startTestButton: document.getElementById("startTestButton"),
-  stopTestButton: document.getElementById("stopTestButton"),
   closeTestButton: document.getElementById("closeTestButton"),
   testStatus: document.getElementById("testStatus"),
   testPreviousButton: document.getElementById("testPreviousButton"),
@@ -411,44 +406,10 @@ function shuffleCards(cards) {
 }
 
 function renderTestControls() {
-  const groups = getGroups();
-  const currentRange = elements.testRangeSelect.value || "all";
-
-  elements.testRangeSelect.replaceChildren();
-
-  const allOption = document.createElement("option");
-  allOption.value = "all";
-  allOption.textContent = `全部 (${state.cards.length})`;
-  elements.testRangeSelect.append(allOption);
-
-  groups.forEach((group) => {
-    const option = document.createElement("option");
-    const count = getCardsForTestRange(group).length;
-    option.value = group;
-    option.textContent = `${group} (${count})`;
-    elements.testRangeSelect.append(option);
-  });
-
-  elements.testRangeSelect.value =
-    currentRange === "all" || groups.includes(currentRange) ? currentRange : "all";
-
-  const availableCount = getCardsForTestRange(elements.testRangeSelect.value).length;
-  const maxCount = Math.max(availableCount, 1);
-  const requestedCount = Number.parseInt(elements.testCountInput.value, 10);
-  const normalizedCount = Number.isFinite(requestedCount)
-    ? Math.min(Math.max(requestedCount, 1), maxCount)
-    : 1;
-
-  elements.testCountInput.min = "1";
-  elements.testCountInput.max = String(maxCount);
-  elements.testCountInput.value = availableCount > 0 ? String(normalizedCount) : "1";
-  elements.testCountInput.disabled = availableCount === 0;
-  elements.startTestButton.disabled = availableCount === 0;
-  elements.stopTestButton.disabled = !state.isTestMode;
-  elements.testCountLimit.textContent = `最多 ${availableCount}`;
+  const currentGroupLabel = state.currentGroup === "all" ? "全部" : state.currentGroup;
   elements.testStatus.textContent = state.isTestMode
-    ? `测试中：${state.testCards.length} 张`
-    : "选择分组和数量后开始测试。";
+    ? `${currentGroupLabel} · ${state.testCards.length} 张`
+    : `${currentGroupLabel} · 0 张`;
   renderTestCard();
 }
 
@@ -574,8 +535,8 @@ function renderTestCard() {
   const hasCard = Boolean(card);
 
   elements.testCardCount.textContent = hasCard ? `${state.testIndex + 1} / ${state.testCards.length}` : "0 / 0";
-  elements.testEnglishWord.textContent = hasCard ? card.english : "点击开始";
-  elements.testChineseWord.textContent = hasCard ? card.chinese : "随机显示测试卡片";
+  elements.testEnglishWord.textContent = hasCard ? card.english : "暂无卡片";
+  elements.testChineseWord.textContent = hasCard ? card.chinese : "请先选择有卡片的分组";
 
   if (hasCard) {
     elements.testCardImage.src = card.image;
@@ -1025,17 +986,16 @@ async function clearCards() {
 }
 
 function startTest() {
-  const candidates = getCardsForTestRange(elements.testRangeSelect.value);
+  const candidates = getVisibleCards();
   if (candidates.length === 0) {
+    state.isTestMode = false;
+    state.testCards = [];
+    state.testIndex = 0;
+    renderTestControls();
     return;
   }
 
-  const requestedCount = Number.parseInt(elements.testCountInput.value, 10);
-  const count = Number.isFinite(requestedCount)
-    ? Math.min(Math.max(requestedCount, 1), candidates.length)
-    : 1;
-
-  state.testCards = shuffleCards(candidates).slice(0, count);
+  state.testCards = shuffleCards(candidates);
   state.isTestMode = true;
   state.testIndex = 0;
   renderTestControls();
@@ -1049,14 +1009,9 @@ function stopTest() {
 }
 
 function openTest() {
-  const groups = getGroups();
-  const preferredRange = state.currentGroup === "all" || groups.includes(state.currentGroup) ? state.currentGroup : "all";
-  elements.testRangeSelect.value = preferredRange;
   elements.testOverlay.classList.add("open");
   elements.testOverlay.setAttribute("aria-hidden", "false");
-  renderTestControls();
-  elements.testRangeSelect.value = preferredRange;
-  renderTestControls();
+  startTest();
 }
 
 function closeTest() {
@@ -1087,10 +1042,6 @@ function bindEvents() {
   elements.englishVoiceSelect.addEventListener("change", saveSpeechSettings);
   elements.speechRateInput.addEventListener("input", saveSpeechSettings);
   elements.clearSpeechInput.addEventListener("change", saveSpeechSettings);
-  elements.testRangeSelect.addEventListener("change", renderTestControls);
-  elements.testCountInput.addEventListener("input", renderTestControls);
-  elements.startTestButton.addEventListener("click", startTest);
-  elements.stopTestButton.addEventListener("click", stopTest);
   elements.openTestButton.addEventListener("click", openTest);
   elements.closeTestButton.addEventListener("click", closeTest);
   elements.testPreviousButton.addEventListener("click", () => moveTestCard(-1));
