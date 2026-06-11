@@ -4,15 +4,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lucas English Learning</title>
-    <link rel="stylesheet" href="styles.css?v=20260610-10" />
+    <link rel="stylesheet" href="styles.css?v=20260611-1" />
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
     <script src="cards/local-cards.js" defer></script>
   </head>
   <body>
     <main class="app-shell">
+      <section class="grade-screen" id="gradeScreen" aria-label="Grade selection">
+        <div class="grade-picker">
+          <p class="grade-eyebrow">Lucas English Learning</p>
+          <h1>&#36873;&#25321;&#24180;&#32423;</h1>
+          <div class="grade-options" id="gradeOptions"></div>
+        </div>
+      </section>
       <section class="workspace" aria-label="英语学习卡片">
         <header class="topbar">
           <h1>Lucas English Learning</h1>
+          <button class="grade-button" id="gradeButton" type="button">Grade</button>
           <label class="group-filter">
             <span>分组</span>
             <select id="groupFilter">

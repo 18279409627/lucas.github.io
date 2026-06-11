@@ -7,6 +7,16 @@ const VOICE_STORAGE_KEY = "kindergarten-english-voice-v4";
 const RATE_STORAGE_KEY = "kindergarten-speech-rate-v3";
 const CLEAR_SPEECH_STORAGE_KEY = "kindergarten-clear-speech-v1";
 const CURRENT_GROUP_STORAGE_KEY = "kindergarten-current-group-v1";
+const CURRENT_GRADE_STORAGE_KEY = "kindergarten-current-grade-v1";
+const DEFAULT_GRADE = "\u4e2d\u73ed\u4e0a\u5b66\u671f";
+const GRADE_OPTIONS = [
+  "\u5c0f\u73ed\u4e0a\u5b66\u671f",
+  "\u5c0f\u73ed\u4e0b\u5b66\u671f",
+  "\u4e2d\u73ed\u4e0a\u5b66\u671f",
+  "\u4e2d\u73ed\u4e0b\u5b66\u671f",
+  "\u5927\u73ed\u4e0a\u5b66\u671f",
+  "\u5927\u73ed\u4e0b\u5b66\u671f",
+];
 
 const WORD_DICTIONARY = {
   apple: "苹果",
@@ -153,6 +163,7 @@ const WORD_DICTIONARY = {
 const state = {
   cards: [],
   currentIndex: 0,
+  currentGrade: DEFAULT_GRADE,
   currentGroup: "all",
   pendingImage: "",
   db: null,
@@ -168,6 +179,7 @@ function getLocalCards() {
   const cards = [];
 
   groups.forEach((groupEntry, groupIndex) => {
+    const grade = normalizeGrade(String(groupEntry.grade || DEFAULT_GRADE));
     const group = normalizeGroup(String(groupEntry.group || DEFAULT_GROUP));
     const groupCards = Array.isArray(groupEntry.cards) ? groupEntry.cards : [];
 
@@ -182,6 +194,7 @@ function getLocalCards() {
         id: `local:${groupIndex}:${cardIndex}:${english}:${image}`,
         english,
         chinese: String(cardEntry.chinese || translateFromDictionary(english) || "").trim() || "未翻译",
+        grade,
         group,
         image,
         createdAt: -1000000 + groupIndex * 1000 + cardIndex,
@@ -194,6 +207,9 @@ function getLocalCards() {
 }
 
 const elements = {
+  gradeScreen: document.getElementById("gradeScreen"),
+  gradeOptions: document.getElementById("gradeOptions"),
+  gradeButton: document.getElementById("gradeButton"),
   studyCard: document.getElementById("studyCard"),
   cardImage: document.getElementById("cardImage"),
   emptyIllustration: document.getElementById("emptyIllustration"),
@@ -244,9 +260,67 @@ function normalizeGroup(value) {
   return value.trim().replace(/\s+/g, " ") || DEFAULT_GROUP;
 }
 
+function normalizeGrade(value) {
+  return value.trim().replace(/\s+/g, " ") || DEFAULT_GRADE;
+}
+
+function getCardsInCurrentGrade() {
+  return state.cards.filter((card) => normalizeGrade(card.grade || DEFAULT_GRADE) === state.currentGrade);
+}
+
 function getGroups() {
-  const groups = new Set(state.cards.map((card) => normalizeGroup(card.group || DEFAULT_GROUP)));
+  const groups = new Set(getCardsInCurrentGrade().map((card) => normalizeGroup(card.group || DEFAULT_GROUP)));
   return [...groups].sort((a, b) => a.localeCompare(b, "zh-CN"));
+}
+
+function saveCurrentGrade() {
+  localStorage.setItem(CURRENT_GRADE_STORAGE_KEY, state.currentGrade);
+}
+
+function loadCurrentGrade() {
+  const savedGrade = localStorage.getItem(CURRENT_GRADE_STORAGE_KEY);
+  if (savedGrade) {
+    state.currentGrade = normalizeGrade(savedGrade);
+  }
+}
+
+function renderGradeControls() {
+  elements.gradeButton.textContent = state.currentGrade;
+  elements.gradeOptions.replaceChildren(
+    ...GRADE_OPTIONS.map((grade) => {
+      const button = document.createElement("button");
+      button.className = `grade-option${grade === state.currentGrade ? " selected" : ""}`;
+      button.type = "button";
+      button.textContent = grade;
+      button.addEventListener("click", () => selectGrade(grade));
+      return button;
+    }),
+  );
+}
+
+function openGradeScreen() {
+  renderGradeControls();
+  elements.gradeScreen.classList.add("open");
+  elements.gradeScreen.removeAttribute("hidden");
+}
+
+function closeGradeScreen() {
+  elements.gradeScreen.classList.remove("open");
+  elements.gradeScreen.setAttribute("hidden", "");
+}
+
+function selectGrade(grade) {
+  state.currentGrade = normalizeGrade(grade);
+  state.currentGroup = "all";
+  state.currentIndex = 0;
+  state.isTestMode = false;
+  state.testCards = [];
+  state.testIndex = 0;
+  saveCurrentGrade();
+  saveCurrentGroup();
+  resetForm();
+  closeGradeScreen();
+  render();
 }
 
 function saveCurrentGroup() {
@@ -261,11 +335,13 @@ function loadCurrentGroup() {
 }
 
 function getVisibleCards() {
+  const gradeCards = getCardsInCurrentGrade();
+
   if (state.currentGroup === "all") {
-    return state.cards;
+    return gradeCards;
   }
 
-  return state.cards.filter((card) => normalizeGroup(card.group || DEFAULT_GROUP) === state.currentGroup);
+  return gradeCards.filter((card) => normalizeGroup(card.group || DEFAULT_GROUP) === state.currentGroup);
 }
 
 function getCurrentCard() {
@@ -305,6 +381,7 @@ function loadCards() {
     request.addEventListener("success", () => {
       const savedCards = request.result.map((card) => ({
         ...card,
+        grade: normalizeGrade(card.grade || DEFAULT_GRADE),
         group: normalizeGroup(card.group || DEFAULT_GROUP),
         source: card.source || "user",
       }));
@@ -356,6 +433,7 @@ function clampCurrentIndex() {
 }
 
 function renderGroupControls() {
+  const gradeCards = getCardsInCurrentGrade();
   const groups = getGroups();
   const selectedExists = state.currentGroup === "all" || groups.includes(state.currentGroup);
 
@@ -369,12 +447,12 @@ function renderGroupControls() {
 
   const allOption = document.createElement("option");
   allOption.value = "all";
-  allOption.textContent = `全部 (${state.cards.length})`;
+  allOption.textContent = `全部 (${gradeCards.length})`;
   elements.groupFilter.append(allOption);
 
   groups.forEach((group) => {
     const option = document.createElement("option");
-    const count = state.cards.filter((card) => normalizeGroup(card.group || DEFAULT_GROUP) === group).length;
+    const count = gradeCards.filter((card) => normalizeGroup(card.group || DEFAULT_GROUP) === group).length;
     option.value = group;
     option.textContent = `${group} (${count})`;
     elements.groupFilter.append(option);
@@ -420,10 +498,12 @@ function renderTestControls() {
 }
 
 function render() {
+  renderGradeControls();
   renderGroupControls();
   renderTestControls();
   clampCurrentIndex();
 
+  const gradeCards = getCardsInCurrentGrade();
   const visibleCards = getVisibleCards();
   const card = getCurrentCard();
   const hasCards = Boolean(card);
@@ -458,10 +538,10 @@ function render() {
   elements.englishVoiceSelect.disabled = false;
   elements.speechRateInput.disabled = false;
   elements.clearSpeechInput.disabled = false;
-  elements.groupFilter.disabled = state.cards.length === 0;
+  elements.groupFilter.disabled = gradeCards.length === 0;
   elements.cardForm.querySelector("button[type='submit']").disabled = !state.storageReady || state.isRecognizing;
   elements.listTotal.textContent =
-    state.currentGroup === "all" ? `${state.cards.length} 张` : `${visibleCards.length} / ${state.cards.length} 张`;
+    state.currentGroup === "all" ? `${gradeCards.length} 张` : `${visibleCards.length} / ${gradeCards.length} 张`;
 
   renderList(visibleCards);
 }
@@ -920,6 +1000,7 @@ async function handleSubmit(event) {
     id: window.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     english,
     chinese,
+    grade: state.currentGrade,
     group,
     image: state.pendingImage,
     createdAt: Date.now(),
@@ -1134,6 +1215,7 @@ function bindEvents() {
   bindSwipe(elements.testCard, () => moveTestCard(1), () => moveTestCard(-1));
   elements.testSpeakEnglishButton.addEventListener("click", () => speak(getCurrentTestCard()?.english, getEnglishAccent()));
   elements.testSpeakChineseButton.addEventListener("click", () => speak(getCurrentTestCard()?.chinese, "zh-CN"));
+  elements.gradeButton.addEventListener("click", openGradeScreen);
   elements.settingsButton.addEventListener("click", openSettings);
   elements.closeSettingsButton.addEventListener("click", closeSettings);
   elements.clearButton.addEventListener("click", clearCards);
@@ -1173,9 +1255,11 @@ async function start() {
 
   bindEvents();
   loadEnglishAccent();
+  loadCurrentGrade();
   loadCurrentGroup();
   setDefaultGroupForForm();
   render();
+  openGradeScreen();
 }
 
 start();

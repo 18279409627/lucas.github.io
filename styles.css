@@ -65,6 +65,63 @@ button {
   overflow: hidden;
 }
 
+.grade-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  place-items: center;
+  padding: 18px;
+  background: linear-gradient(135deg, #f7f4eb 0%, #eaf5ee 52%, #edf4fb 100%);
+}
+
+.grade-screen.open {
+  display: grid;
+}
+
+.grade-picker {
+  width: min(420px, 100%);
+  border: 1px solid rgba(221, 213, 199, 0.9);
+  border-radius: 8px;
+  padding: 24px;
+  background: rgba(255, 254, 250, 0.96);
+  box-shadow: var(--shadow);
+}
+
+.grade-eyebrow {
+  margin-bottom: 6px;
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.grade-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.grade-option,
+.grade-button {
+  min-height: 64px;
+  border-radius: 8px;
+  background: #eef5ff;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.grade-option {
+  font-size: 1.18rem;
+}
+
+.grade-option.selected {
+  background: var(--blue);
+  color: #fff;
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -123,6 +180,15 @@ h1 {
   min-height: 38px;
   border-radius: 8px;
   font-size: 0.9rem;
+}
+
+.grade-button {
+  width: auto;
+  min-width: 92px;
+  min-height: 38px;
+  padding: 0 12px;
+  background: #f1e8da;
+  font-size: 0.86rem;
 }
 
 .test-button {
@@ -836,6 +902,21 @@ button:disabled {
     width: 48px;
     min-height: 34px;
     font-size: 0.82rem;
+  }
+
+  .grade-button {
+    min-width: 76px;
+    min-height: 34px;
+    padding: 0 8px;
+    font-size: 0.76rem;
+  }
+
+  .grade-picker {
+    padding: 18px;
+  }
+
+  .grade-options {
+    grid-template-columns: 1fr;
   }
 
   .speak-button {

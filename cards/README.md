@@ -1,38 +1,33 @@
 # Local card images
 
-Put grouped card images under this folder and register them in `local-cards.js`.
-
-Recommended structure:
+The `cards/` folder uses grade as the first level and group as the second level.
 
 ```text
 cards/
   local-cards.js
-  animals/
-    cat.jpg
-    dog.jpg
-  fruits/
-    apple.jpg
-    banana.jpg
+  中班上学期/
+    color/
+      blue.jpg
+      yellow.jpg
+    animals/
+      cat.jpg
+      dog.jpg
+  中班下学期/
+    fruits/
+      apple.jpg
+      banana.jpg
 ```
 
-Then edit `local-cards.js`:
+Rules:
 
-```js
-window.LOCAL_CARD_GROUPS = [
-  {
-    group: "动物",
-    cards: [
-      { english: "cat", chinese: "猫", image: "cards/animals/cat.jpg" },
-      { english: "dog", chinese: "狗", image: "cards/animals/dog.jpg" },
-    ],
-  },
-  {
-    group: "水果",
-    cards: [
-      { english: "apple", chinese: "苹果", image: "cards/fruits/apple.jpg" },
-    ],
-  },
-];
+- First-level folders are grades, such as `中班上学期`.
+- Second-level folders are groups, such as `color`.
+- Image file names become the default English words, so `blue.jpg` becomes `blue`.
+
+After adding or moving images, run this from the project root:
+
+```bat
+generate-local-cards.bat
 ```
 
-When using on mobile, keep `index.html`, `styles.css`, `app.js`, and the full `cards/` folder together.
+It updates `cards/local-cards.js`, which is loaded by `index.html`.

@@ -3,17 +3,34 @@
 
 window.LOCAL_CARD_GROUPS = [
     {
+        "grade":  "中班上学期",
         "group":  "color",
         "cards":  [
                       {
                           "english":  "blue",
                           "chinese":  "",
-                          "image":  "cards/color/blue.jpg"
+                          "image":  "cards/中班上学期/color/blue.jpg"
                       },
                       {
                           "english":  "yellow",
                           "chinese":  "",
-                          "image":  "cards/color/yellow.jpg"
+                          "image":  "cards/中班上学期/color/yellow.jpg"
+                      }
+                  ]
+    },
+    {
+        "grade":  "中班下学期",
+        "group":  "color",
+        "cards":  [
+                      {
+                          "english":  "blue",
+                          "chinese":  "",
+                          "image":  "cards/中班下学期/color/blue.jpg"
+                      },
+                      {
+                          "english":  "yellow",
+                          "chinese":  "",
+                          "image":  "cards/中班下学期/color/yellow.jpg"
                       }
                   ]
     }

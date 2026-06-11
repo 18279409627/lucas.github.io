@@ -1,4 +1,4 @@
-$cardsRoot = Join-Path $PSScriptRoot "..\cards"
+﻿$cardsRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\cards"))
 $outputPath = Join-Path $cardsRoot "local-cards.js"
 $imageExtensions = @(".jpg", ".jpeg", ".png", ".webp", ".gif")
 $existingCardsByImage = @{}
@@ -14,14 +14,20 @@ if (Test-Path -LiteralPath $outputPath) {
   }
 }
 
-$groups = @(Get-ChildItem -LiteralPath $cardsRoot -Directory | Sort-Object Name | ForEach-Object {
-  $groupDirectory = $_
+function New-CardGroup {
+  param(
+    [Parameter(Mandatory=$true)] [System.IO.DirectoryInfo] $GroupDirectory,
+    [Parameter(Mandatory=$true)] [string] $Grade,
+    [Parameter(Mandatory=$true)] [string] $Group
+  )
+
   $cards = @(Get-ChildItem -LiteralPath $groupDirectory.FullName -File |
     Where-Object { $imageExtensions -contains $_.Extension.ToLowerInvariant() } |
     Sort-Object Name |
     ForEach-Object {
       $english = [System.IO.Path]::GetFileNameWithoutExtension($_.Name) -replace "[-_]+", " "
-      $relativePath = "cards/$($groupDirectory.Name)/$($_.Name)"
+      $relativeFilePath = $_.FullName.Substring($cardsRoot.Length).TrimStart("\", "/") -replace "\\", "/"
+      $relativePath = "cards/$relativeFilePath"
       $chinese = ""
 
       if ($existingCardsByImage.ContainsKey($relativePath)) {
@@ -38,11 +44,24 @@ $groups = @(Get-ChildItem -LiteralPath $cardsRoot -Directory | Sort-Object Name 
 
   if ($cards.Count -gt 0) {
     [pscustomobject]@{
-      group = $groupDirectory.Name
+      grade = $Grade
+      group = $Group
       cards = @($cards)
     }
   }
-})
+}
+
+$groups = @()
+
+Get-ChildItem -LiteralPath $cardsRoot -Directory | Sort-Object Name | ForEach-Object {
+  $gradeDirectory = $_
+  Get-ChildItem -LiteralPath $gradeDirectory.FullName -Directory | Sort-Object Name | ForEach-Object {
+    $groupEntry = New-CardGroup -GroupDirectory $_ -Grade $gradeDirectory.Name -Group $_.Name
+    if ($null -ne $groupEntry) {
+      $groups += $groupEntry
+    }
+  }
+}
 
 if ($groups.Count -eq 0) {
   $json = "[]"
